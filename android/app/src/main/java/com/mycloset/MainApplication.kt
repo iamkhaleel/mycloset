@@ -1,4 +1,5 @@
-package com.mycloset
+package com.MyCloset.app
+
 
 import android.app.Application
 import com.facebook.react.PackageList

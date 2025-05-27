@@ -1,4 +1,5 @@
-package com.mycloset
+package com.MyCloset.app
+
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

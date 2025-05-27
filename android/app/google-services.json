@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "738710187136",
+    "project_id": "mycloset-3e5c0",
+    "storage_bucket": "mycloset-3e5c0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738710187136:android:67aa63435f88692b7dca65",
+        "android_client_info": {
+          "package_name": "com.MyCloset.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738710187136-84mq7hddf6hedtrn59rgfqhgqhh8qu5s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.MyCloset.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "738710187136-m02ql9s8s2pb54kd68tc26dqlo2n3493.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdv50onkRxLNqYjr9oPCkCRL6wbX7z8Sw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "738710187136-m02ql9s8s2pb54kd68tc26dqlo2n3493.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
