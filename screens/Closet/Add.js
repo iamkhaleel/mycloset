@@ -18,6 +18,7 @@ import ResponsiveButton from '../../components/Button';
 import firestore from '@react-native-firebase/firestore';
 import RNFS from 'react-native-fs';
 import ModalDropdown from 'react-native-modal-dropdown';
+import auth from '@react-native-firebase/auth';
 
 const CATEGORIES = [
   'Tops',
@@ -165,7 +166,15 @@ const AddItem = () => {
 
     setLoading(true);
     try {
+      const currentUser = auth().currentUser;
+      if (!currentUser) {
+        throw new Error('No authenticated user');
+      }
+
+      // Save to user's items subcollection
       await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
         .collection('items')
         .add({
           imageBase64: base64Image,
@@ -179,13 +188,14 @@ const AddItem = () => {
           price: price ? parseFloat(price) : null,
           note,
           timestamp: firestore.FieldValue.serverTimestamp(),
+          userId: currentUser.uid,
         });
 
       Alert.alert('Success', 'Item saved Successfully!');
       navigation.goBack();
     } catch (error) {
       console.error('Firestore error:', error);
-      Alert.alert('Error', 'Failed to upload item');
+      Alert.alert('Error', 'Failed to upload item. Please try again.');
     } finally {
       setLoading(false);
     }

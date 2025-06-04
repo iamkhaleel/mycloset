@@ -13,7 +13,7 @@ import {
 import Ionicons from '@react-native-vector-icons/ionicons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, StackActions} from '@react-navigation/native';
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -39,17 +39,34 @@ const Settings = () => {
 
   const fetchCounts = async () => {
     try {
+      // Check if user is authenticated
+      const currentUser = auth().currentUser;
+      if (!currentUser) {
+        console.log('No authenticated user');
+        return;
+      }
+
       const outfitsSnapshot = await firestore().collection('outfits').get();
       const lookbooksSnapshot = await firestore().collection('lookbooks').get();
       const itemsSnapshot = await firestore().collection('items').get();
+      const closetItemsSnapshot = await firestore()
+        .collection('closetItems')
+        .get();
 
       setCounts({
         outfits: outfitsSnapshot.size,
         lookbooks: lookbooksSnapshot.size,
-        items: itemsSnapshot.size,
+        items: itemsSnapshot.size + closetItemsSnapshot.size,
       });
     } catch (error) {
       console.error('Error fetching counts:', error);
+      if (error.code === 'permission-denied') {
+        Alert.alert(
+          'Error',
+          'You do not have permission to access this data. Please sign in again.',
+        );
+        handleLogout();
+      }
     } finally {
       setLoading(false);
     }
@@ -67,7 +84,11 @@ const Settings = () => {
         onPress: async () => {
           try {
             await auth().signOut();
-            // Navigate to login screen or handle logout
+            // Navigate to Onboarding stack which contains Welcome screen
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'Onboarding'}],
+            });
           } catch (error) {
             console.error('Error logging out:', error);
             Alert.alert('Error', 'Failed to logout. Please try again.');

@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow authenticated users to read and write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read their own items via collection group queries
+    match /{path=**}/items/{itemId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    // Allow authenticated users to read their own outfits via collection group queries
+    match /{path=**}/outfits/{outfitId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    // Allow authenticated users to read their own lookbooks via collection group queries
+    match /{path=**}/lookbooks/{lookbookId} {
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    // Allow authenticated users to access closetItems collection
+    match /closetItems/{itemId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+} 

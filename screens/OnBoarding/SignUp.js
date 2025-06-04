@@ -12,36 +12,60 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import ResponsiveButton from '../../components/Button';
-import {useState} from 'react'; // import your firebase config properly
-import auth from '@react-native-firebase/auth';
+import {useState} from 'react';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+} from '@react-native-firebase/auth';
 
 const SignUp = () => {
   const navigation = useNavigation();
-
-  const handleGoback = () => {
-    navigation.goBack();
-  };
-
-  const SignUpTestFn = () => {
-    auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then(() => {
-        Alert.alert('user Created');
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const {width, height} = Dimensions.get('window');
-  const handleSignUp = () => {
-    navigation.replace('Main');
+
+  const handleGoback = () => {
+    navigation.goBack();
+  };
+
+  const handleSignUp = async () => {
+    if (!email || !password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const auth = getAuth();
+      await createUserWithEmailAndPassword(auth, email, password);
+      setLoading(false);
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Main'}],
+      });
+    } catch (error) {
+      setLoading(false);
+      let errorMessage = 'Failed to create account';
+
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'Email address is already in use';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Password is too weak';
+      }
+
+      Alert.alert('Error', errorMessage);
+      console.error('SignUp Error:', error);
+    }
   };
 
   return (

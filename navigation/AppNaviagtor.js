@@ -14,12 +14,26 @@ const Stack = createStackNavigator();
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        {/* First screen is Onboarding */}
-        <Stack.Screen name="Onboarding" component={OnboardingStack} />
+      <Stack.Navigator
+        initialRouteName="Onboarding"
+        screenOptions={{headerShown: false}}>
+        {/* Onboarding Stack contains Welcome, Login, SignUp screens */}
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingStack}
+          options={{
+            gestureEnabled: false, // Prevent swipe back
+          }}
+        />
 
-        {/* After login, navigate to MainApp */}
-        <Stack.Screen name="Main" component={MainTabNavigator} />
+        {/* Main App Stack */}
+        <Stack.Screen
+          name="Main"
+          component={MainTabNavigator}
+          options={{
+            gestureEnabled: false, // Prevent swipe back to login
+          }}
+        />
 
         {/* ADD Items Screen */}
         <Stack.Screen name="Add" component={Additem} />

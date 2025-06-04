@@ -11,10 +11,16 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import ResponsiveButton from '../../components/Button';
 import {useEffect, useState} from 'react';
-import AppNavigator from '../../navigation/AppNaviagtor';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
+import {getAuth, signInWithEmailAndPassword} from '@react-native-firebase/auth';
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  serverTimestamp,
+} from '@react-native-firebase/firestore';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -30,34 +36,54 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+
     try {
       setLoading(true);
+      const auth = getAuth();
+      const db = getFirestore();
 
-      const userCredential = await auth().signInWithEmailAndPassword(
+      // Sign in with Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
         email,
         password,
-      ); // FIXED
+      );
 
-      const token = userCredential.user.uid; // Now userCredential is defined
-
-      // Save to AsyncStorage
+      // Store the user token
+      const token = userCredential.user.uid;
       await AsyncStorage.setItem('userToken', token);
+
+      // Create or update user document in Firestore
+      const userRef = doc(collection(db, 'users'), userCredential.user.uid);
+      await setDoc(
+        userRef,
+        {
+          email: userCredential.user.email,
+          lastLogin: serverTimestamp(),
+        },
+        {merge: true},
+      );
 
       setLoading(false);
       navigation.replace('Main');
     } catch (error) {
       setLoading(false);
-      let errorMessage = 'An error occurred. Please try again.';
-      if (error.code === 'auth/network-request-failed') {
-        errorMessage =
-          'Network problem. Please check your internet connection.';
-      } else if (error.code === 'auth/user-not-found') {
-        errorMessage = 'User not found. Check your email.';
+      console.error('Login Error:', error);
+
+      let errorMessage = 'Failed to login. Please check your credentials.';
+      if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email.';
       } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Wrong password. Please try again.';
+        errorMessage = 'Invalid password.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address.';
       }
 
-      Alert.alert('Login Error', errorMessage);
+      Alert.alert('Error', errorMessage);
     }
   };
 
@@ -66,7 +92,7 @@ const Login = () => {
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: webClientId, // From Firebase console
+      webClientId: webClientId,
     });
   }, []);
 
@@ -74,17 +100,11 @@ const Login = () => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log('userinfo', userInfo);
+      console.log('Google Sign-In Success:', userInfo);
       navigation.replace('Main');
     } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log(error);
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        console.log(error);
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        console.log(error);
-      } else {
-      }
+      console.error('Google Sign-In Error:', error);
+      Alert.alert('Error', 'Failed to sign in with Google');
     }
   };
 
