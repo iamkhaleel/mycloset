@@ -5,6 +5,9 @@ import {createStackNavigator} from '@react-navigation/stack';
 import OnboardingStack from './OnboardingStack';
 import MainTabNavigator from './MainTabNavigator';
 import Additem from '../screens/Closet/Add';
+import ItemDetails from '../screens/Closet/itemdetails';
+import AddOutfit from '../screens/Outfits/AddOutfit';
+import AddLookbook from '../screens/Lookbooks/AddLookbook';
 
 const Stack = createStackNavigator();
 
@@ -20,6 +23,15 @@ const AppNavigator = () => {
 
         {/* ADD Items Screen */}
         <Stack.Screen name="Add" component={Additem} />
+
+        {/* Items Details Screen */}
+        <Stack.Screen name="ItemDetails" component={ItemDetails} />
+
+        {/* Add Outfit Screen */}
+        <Stack.Screen name="AddOutfit" component={AddOutfit} />
+
+        {/* Add Lookbook Screen */}
+        <Stack.Screen name="AddLookbook" component={AddLookbook} />
       </Stack.Navigator>
     </NavigationContainer>
   );
