@@ -74,10 +74,8 @@ const SubscriptionIntro = () => {
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>Upgrade to Pro</Text>
-          <Text style={styles.subtitle}>
-            Unlock all features and take your style to the next level
-          </Text>
+          <Text style={styles.title}>Unlock Premium Features</Text>
+          <Text style={styles.subtitle}>Take your style to the next level</Text>
         </View>
 
         <View style={styles.featuresContainer}>

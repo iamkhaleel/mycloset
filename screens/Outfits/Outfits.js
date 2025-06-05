@@ -15,6 +15,11 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import OutfitCard from '../../components/OutfitCard';
+import {
+  checkPremiumStatus,
+  FREE_TIER_LIMITS,
+} from '../../utils/PremiumFeatures';
+import PremiumModal from '../../components/PremiumModal';
 
 const Outfits = () => {
   const navigation = useNavigation();
@@ -24,6 +29,8 @@ const Outfits = () => {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedOutfits, setSelectedOutfits] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const fetchOutfits = async () => {
     try {
@@ -47,8 +54,14 @@ const Outfits = () => {
   };
 
   useEffect(() => {
+    checkUserPremiumStatus();
     fetchOutfits();
   }, []);
+
+  const checkUserPremiumStatus = async () => {
+    const premium = await checkPremiumStatus();
+    setIsPremium(premium);
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -56,7 +69,11 @@ const Outfits = () => {
   };
 
   const handleAddOutfit = () => {
-    navigation.navigate('AddOutfit');
+    if (!isPremium && outfits.length >= FREE_TIER_LIMITS.MAX_OUTFITS) {
+      setShowPremiumModal(true);
+    } else {
+      navigation.navigate('AddOutfit');
+    }
   };
 
   const handleOutfitPress = outfit => {
@@ -169,6 +186,19 @@ const Outfits = () => {
         )}
       </View>
 
+      {!isPremium && outfits.length > 0 && (
+        <View style={styles.limitContainer}>
+          <Text style={styles.limitText}>
+            {outfits.length}/{FREE_TIER_LIMITS.MAX_OUTFITS} Outfits Used
+          </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('SubscriptionIntro')}
+            style={styles.upgradeButton}>
+            <Text style={styles.upgradeButtonText}>Upgrade for Unlimited</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <ScrollView
         style={styles.content}
         refreshControl={
@@ -221,6 +251,16 @@ const Outfits = () => {
           </View>
         </Pressable>
       </Modal>
+
+      <PremiumModal
+        visible={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        onUpgrade={() => {
+          setShowPremiumModal(false);
+          navigation.navigate('SubscriptionIntro');
+        }}
+        featureName="Unlimited Outfits"
+      />
     </View>
   );
 };
@@ -341,6 +381,31 @@ const styles = StyleSheet.create({
   menuText: {
     marginLeft: 12,
     fontSize: 16,
+  },
+  limitContainer: {
+    backgroundColor: '#f8f8f8',
+    margin: 16,
+    padding: 15,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  limitText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  upgradeButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  upgradeButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });
 

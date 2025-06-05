@@ -14,6 +14,7 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation, StackActions} from '@react-navigation/native';
+import {checkPremiumStatus} from '../../utils/PremiumFeatures';
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -24,6 +25,7 @@ const Settings = () => {
   });
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(user => {
@@ -35,6 +37,7 @@ const Settings = () => {
 
   useEffect(() => {
     fetchCounts();
+    checkUserPremiumStatus();
   }, []);
 
   const fetchCounts = async () => {
@@ -70,6 +73,11 @@ const Settings = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkUserPremiumStatus = async () => {
+    const premium = await checkPremiumStatus();
+    setIsPremium(premium);
   };
 
   const handleLogout = async () => {
@@ -124,10 +132,21 @@ const Settings = () => {
   };
 
   const handleSupport = () => {
-    Linking.openURL('mailto:support@mycloset.app').catch(err => {
-      console.error('Error opening mail:', err);
-      Alert.alert('Error', 'Could not open email client');
-    });
+    if (isPremium) {
+      // Priority support email for premium users
+      Linking.openURL(
+        'mailto:priority-support@mycloset.app?subject=Premium Support Request',
+      ).catch(err => {
+        console.error('Error opening mail:', err);
+        Alert.alert('Error', 'Could not open email client');
+      });
+    } else {
+      // Regular support for free users
+      Linking.openURL('mailto:support@mycloset.app').catch(err => {
+        console.error('Error opening mail:', err);
+        Alert.alert('Error', 'Could not open email client');
+      });
+    }
   };
 
   return (
@@ -139,21 +158,35 @@ const Settings = () => {
         <Text style={styles.sectionTitle}>Account</Text>
         <TouchableOpacity style={styles.accountButton}>
           <Ionicons name="person-outline" size={28} color="#333" />
-          <Text style={styles.accountEmail}>
-            {user?.email || 'Not signed in'}
-          </Text>
+          <View style={styles.accountInfo}>
+            <Text style={styles.accountEmail}>
+              {user?.email || 'Not signed in'}
+            </Text>
+            {isPremium && (
+              <View style={styles.premiumBadge}>
+                <Ionicons name="star" size={14} color="#fff" />
+                <Text style={styles.premiumText}>Premium</Text>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
       </View>
 
-      {/* Pro Box */}
-      <View style={styles.proBox}>
-        <TouchableOpacity style={styles.joinButton}>
-          <Text style={styles.joinButtonText}>JOIN</Text>
-        </TouchableOpacity>
-        <Text style={styles.proTitle}>MyCloset Pro</Text>
-        <Text style={styles.proSubtitle}>Unlock the full experience</Text>
-        <Text style={styles.proPrice}>$4.99/month</Text>
-      </View>
+      {/* Pro Box - Only show for non-premium users */}
+      {!isPremium && (
+        <View style={styles.proBox}>
+          <TouchableOpacity
+            style={styles.joinButton}
+            onPress={() => navigation.navigate('SubscriptionIntro')}>
+            <Text style={styles.joinButtonText}>UPGRADE</Text>
+          </TouchableOpacity>
+          <Text style={styles.proTitle}>MyCloset Premium</Text>
+          <Text style={styles.proSubtitle}>
+            Take your style to the next level
+          </Text>
+          <Text style={styles.proPrice}>Starting at $4.99/month</Text>
+        </View>
+      )}
 
       {/* Stats */}
       <View style={styles.statsContainer}>
@@ -194,8 +227,9 @@ const Settings = () => {
           },
           {
             icon: 'help-circle-outline',
-            label: 'Help & Support',
+            label: isPremium ? 'Priority Support' : 'Help & Support',
             onPress: handleSupport,
+            badge: isPremium ? 'Premium' : null,
           },
           {
             icon: 'settings-outline',
@@ -228,6 +262,11 @@ const Settings = () => {
                 style={[styles.optionLabel, item.color && {color: item.color}]}>
                 {item.label}
               </Text>
+              {item.badge && (
+                <View style={styles.optionBadge}>
+                  <Text style={styles.optionBadgeText}>{item.badge}</Text>
+                </View>
+              )}
             </View>
             <Ionicons name="chevron-forward" size={20} color="#ccc" />
           </TouchableOpacity>
@@ -266,6 +305,10 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     backgroundColor: '#f5f5f5',
+  },
+  accountInfo: {
+    flex: 1,
+    marginLeft: 10,
   },
   accountEmail: {
     marginLeft: 10,
@@ -362,6 +405,34 @@ const styles = StyleSheet.create({
     color: '#999',
     fontSize: 14,
     marginVertical: 20,
+  },
+  premiumBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#000',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginTop: 4,
+  },
+  premiumText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  optionBadge: {
+    backgroundColor: '#000',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  optionBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
 

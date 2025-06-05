@@ -1,12 +1,19 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Image,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
+import {
+  checkPremiumStatus,
+  PREMIUM_FEATURES,
+} from '../../utils/PremiumFeatures';
+import PremiumModal from '../../components/PremiumModal';
 // Filter labels and their icons
 const FILTERS = [
   'All',
@@ -33,7 +40,52 @@ const FILTER_ICONS = {
 };
 
 const Suggested = () => {
+  const navigation = useNavigation();
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [isPremium, setIsPremium] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+  useEffect(() => {
+    checkUserPremiumStatus();
+  }, []);
+
+  const checkUserPremiumStatus = async () => {
+    const premium = await checkPremiumStatus();
+    setIsPremium(premium);
+    if (!premium) {
+      setShowPremiumModal(true);
+    }
+  };
+
+  if (!isPremium) {
+    return (
+      <View style={styles.premiumContainer}>
+        <View style={styles.premiumContent}>
+          <Ionicons name="star" size={60} color="#000" />
+          <Text style={styles.premiumTitle}>Premium Feature</Text>
+          <Text style={styles.premiumDescription}>
+            Get personalized outfit suggestions based on your style, weather,
+            and occasions.
+          </Text>
+          <TouchableOpacity
+            style={styles.upgradeButton}
+            onPress={() => navigation.navigate('SubscriptionIntro')}>
+            <Text style={styles.upgradeButtonText}>Upgrade to Premium</Text>
+          </TouchableOpacity>
+        </View>
+
+        <PremiumModal
+          visible={showPremiumModal}
+          onClose={() => setShowPremiumModal(false)}
+          onUpgrade={() => {
+            setShowPremiumModal(false);
+            navigation.navigate('SubscriptionIntro');
+          }}
+          featureName="Smart Outfit Suggestions"
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -160,6 +212,45 @@ const styles = StyleSheet.create({
   floatingText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+
+  premiumContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
+  },
+  premiumContent: {
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 300,
+  },
+  premiumTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  premiumDescription: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  upgradeButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 25,
+    width: '100%',
+  },
+  upgradeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

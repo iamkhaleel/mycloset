@@ -15,6 +15,11 @@ import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import LookbookCard from '../../components/LookbookCard';
 import Ionicons from '@react-native-vector-icons/ionicons';
+import {
+  checkPremiumStatus,
+  FREE_TIER_LIMITS,
+} from '../../utils/PremiumFeatures';
+import PremiumModal from '../../components/PremiumModal';
 
 const Lookbooks = () => {
   const navigation = useNavigation();
@@ -24,6 +29,8 @@ const Lookbooks = () => {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedLookbooks, setSelectedLookbooks] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const fetchLookbooks = async () => {
     try {
@@ -47,8 +54,14 @@ const Lookbooks = () => {
   };
 
   useEffect(() => {
+    checkUserPremiumStatus();
     fetchLookbooks();
   }, []);
+
+  const checkUserPremiumStatus = async () => {
+    const premium = await checkPremiumStatus();
+    setIsPremium(premium);
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -56,7 +69,11 @@ const Lookbooks = () => {
   };
 
   const handleAddLookbook = () => {
-    navigation.navigate('AddLookbook');
+    if (!isPremium && lookbooks.length >= FREE_TIER_LIMITS.MAX_LOOKBOOKS) {
+      setShowPremiumModal(true);
+    } else {
+      navigation.navigate('AddLookbook');
+    }
   };
 
   const handleLookbookPress = lookbook => {
@@ -216,6 +233,29 @@ const Lookbooks = () => {
           </View>
         </Pressable>
       </Modal>
+
+      {!isPremium && lookbooks.length > 0 && (
+        <View style={styles.limitContainer}>
+          <Text style={styles.limitText}>
+            {lookbooks.length}/{FREE_TIER_LIMITS.MAX_LOOKBOOKS} Lookbooks Used
+          </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('SubscriptionIntro')}
+            style={styles.upgradeButton}>
+            <Text style={styles.upgradeButtonText}>Upgrade for Unlimited</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      <PremiumModal
+        visible={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        onUpgrade={() => {
+          setShowPremiumModal(false);
+          navigation.navigate('SubscriptionIntro');
+        }}
+        featureName="Unlimited Lookbooks"
+      />
     </View>
   );
 };
@@ -303,6 +343,31 @@ const styles = StyleSheet.create({
   menuText: {
     marginLeft: 12,
     fontSize: 16,
+  },
+  limitContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    margin: 20,
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  limitText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  upgradeButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  upgradeButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });
 

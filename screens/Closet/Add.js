@@ -19,6 +19,7 @@ import firestore from '@react-native-firebase/firestore';
 import RNFS from 'react-native-fs';
 import ModalDropdown from 'react-native-modal-dropdown';
 import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
 
 const CATEGORIES = [
   'Tops',
@@ -163,6 +164,10 @@ const AddItem = () => {
       Alert.alert('Error', 'Please select a category');
       return;
     }
+    if (!name) {
+      Alert.alert('Error', 'Please enter a name for the item');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -171,31 +176,29 @@ const AddItem = () => {
         throw new Error('No authenticated user');
       }
 
-      // Save to user's items subcollection
+      // Save to Firestore with all the item data
       await firestore()
-        .collection('users')
-        .doc(currentUser.uid)
         .collection('items')
         .add({
-          imageBase64: base64Image,
           name,
           category,
-          subCategory,
-          brand,
-          size,
-          material,
-          color,
+          subCategory: subCategory || '',
+          brand: brand || '',
+          size: size || '',
+          material: material || '',
+          color: color || '',
           price: price ? parseFloat(price) : null,
-          note,
+          note: note || '',
+          imageBase64: base64Image,
           timestamp: firestore.FieldValue.serverTimestamp(),
           userId: currentUser.uid,
         });
 
-      Alert.alert('Success', 'Item saved Successfully!');
+      Alert.alert('Success', 'Item saved successfully!');
       navigation.goBack();
     } catch (error) {
-      console.error('Firestore error:', error);
-      Alert.alert('Error', 'Failed to upload item. Please try again.');
+      console.error('Error saving item:', error);
+      Alert.alert('Error', 'Failed to save item. Please try again.');
     } finally {
       setLoading(false);
     }

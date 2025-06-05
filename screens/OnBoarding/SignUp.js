@@ -17,6 +17,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
 } from '@react-native-firebase/auth';
+import {firestore} from '@react-native-firebase/firestore';
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -44,27 +45,28 @@ const SignUp = () => {
 
     try {
       setLoading(true);
-      const auth = getAuth();
-      await createUserWithEmailAndPassword(auth, email, password);
-      setLoading(false);
+      const userCredential = await getAuth().createUserWithEmailAndPassword(
+        email,
+        password,
+      );
+
+      // Create user document with premium status
+      await firestore().collection('users').doc(userCredential.user.uid).set({
+        email: email,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        isPremium: false, // Initialize as free user
+        premiumExpiryDate: null,
+      });
+
       navigation.reset({
         index: 0,
         routes: [{name: 'Main'}],
       });
     } catch (error) {
+      console.error('Signup error:', error);
+      Alert.alert('Error', error.message);
+    } finally {
       setLoading(false);
-      let errorMessage = 'Failed to create account';
-
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'Email address is already in use';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email address';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'Password is too weak';
-      }
-
-      Alert.alert('Error', errorMessage);
-      console.error('SignUp Error:', error);
     }
   };
 
