@@ -10,10 +10,11 @@ import {
   FlatList,
   Image,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import firestore from '@react-native-firebase/firestore';
+import {getUserDocs, getCollectionMetadata} from '../../utils/FirestoreService';
 import auth from '@react-native-firebase/auth';
 import {
   checkPremiumStatus,
@@ -51,36 +52,16 @@ const Closet = () => {
   const fetchInitialItems = async () => {
     try {
       setLoading(true);
-      const user = auth().currentUser;
-      if (!user) return;
+      const metadata = await getCollectionMetadata('items');
+      setItemCount(metadata?.totalCount || 0);
 
-      // Get total count first
-      const totalSnapshot = await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .collection('items')
-        .count()
-        .get();
+      const {docs, lastVisible: newLastVisible} = await getUserDocs('items', {
+        limit: ITEMS_PER_PAGE,
+      });
 
-      setItemCount(totalSnapshot.data().count);
-
-      // Then fetch first batch of items
-      const querySnapshot = await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .collection('items')
-        .orderBy('createdAt', 'desc')
-        .limit(ITEMS_PER_PAGE)
-        .get();
-
-      const itemsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setItems(itemsData);
-      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      setAllItemsLoaded(itemsData.length < ITEMS_PER_PAGE);
+      setItems(docs);
+      setLastVisible(newLastVisible);
+      setAllItemsLoaded(docs.length < ITEMS_PER_PAGE);
     } catch (error) {
       console.error('Error fetching items:', error);
       Alert.alert('Error', 'Failed to load items');
@@ -95,29 +76,17 @@ const Closet = () => {
 
     try {
       setLoadingMore(true);
-      const user = auth().currentUser;
-      if (!user) return;
+      const {docs, lastVisible: newLastVisible} = await getUserDocs('items', {
+        limit: ITEMS_PER_PAGE,
+        startAfter: lastVisible,
+      });
 
-      const querySnapshot = await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .collection('items')
-        .orderBy('createdAt', 'desc')
-        .startAfter(lastVisible)
-        .limit(ITEMS_PER_PAGE)
-        .get();
-
-      const newItems = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      if (newItems.length > 0) {
-        setItems([...items, ...newItems]);
-        setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      if (docs.length > 0) {
+        setItems([...items, ...docs]);
+        setLastVisible(newLastVisible);
       }
 
-      setAllItemsLoaded(newItems.length < ITEMS_PER_PAGE);
+      setAllItemsLoaded(docs.length < ITEMS_PER_PAGE);
     } catch (error) {
       console.error('Error fetching more items:', error);
     } finally {
@@ -217,6 +186,9 @@ const Closet = () => {
               Add your first item to get started
             </Text>
           </View>
+        }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
 

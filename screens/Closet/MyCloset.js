@@ -16,6 +16,7 @@ import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
+import auth from '@react-native-firebase/auth';
 import {Alert} from 'react-native';
 
 // Filter names and their corresponding icons
@@ -70,36 +71,25 @@ const MyCloset = () => {
   const fetchClosetItems = async () => {
     try {
       setLoading(true);
+      const user = auth().currentUser;
+      if (!user) throw new Error('No authenticated user');
       const querySnapshot = await firestore()
+        .collection('users')
+        .doc(user.uid)
         .collection('items')
-        .orderBy('timestamp', 'desc')
         .get();
 
-      const items = await Promise.all(
-        querySnapshot.docs.map(async doc => {
-          const data = doc.data();
-          let imageUrl = null;
+      let items = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-          // If using base64 images (from your AddItem page)
-          if (data.imageBase64) {
-            imageUrl = `data:image/jpeg;base64,${data.imageBase64}`;
-          }
-          // If using Firebase Storage references
-          else if (data.imagePath) {
-            try {
-              imageUrl = await storage().ref(data.imagePath).getDownloadURL();
-            } catch (error) {
-              console.error('Error fetching image URL:', error);
-            }
-          }
-
-          return {
-            id: doc.id,
-            ...data,
-            imageUrl,
-          };
-        }),
-      );
+      // Sort by createdAt or timestamp (descending)
+      items.sort((a, b) => {
+        const aDate = a.createdAt?.toDate?.() || a.timestamp?.toDate?.() || 0;
+        const bDate = b.createdAt?.toDate?.() || b.timestamp?.toDate?.() || 0;
+        return bDate - aDate;
+      });
 
       setClosetItems(items);
     } catch (error) {
@@ -197,9 +187,16 @@ const MyCloset = () => {
           style: 'destructive',
           onPress: async () => {
             try {
+              const user = auth().currentUser;
+              if (!user) throw new Error('No authenticated user');
               await Promise.all(
                 selectedItems.map(item =>
-                  firestore().collection('items').doc(item.id).delete(),
+                  firestore()
+                    .collection('users')
+                    .doc(user.uid)
+                    .collection('items')
+                    .doc(item.id)
+                    .delete(),
                 ),
               );
 
@@ -230,6 +227,13 @@ const MyCloset = () => {
       delayLongPress={500}>
       {item.imageUrl ? (
         <Image source={{uri: item.imageUrl}} style={styles.itemImage} />
+      ) : item.imageBase64 ? (
+        <Image
+          source={{uri: `data:image/jpeg;base64,${item.imageBase64}`}}
+          style={styles.itemImage}
+        />
+      ) : item.selectedImage ? (
+        <Image source={{uri: item.selectedImage}} style={styles.itemImage} />
       ) : (
         <View style={[styles.itemImage, styles.placeholderImage]}>
           <Ionicons name="image" size={40} color="#ccc" />

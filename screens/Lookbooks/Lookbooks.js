@@ -12,7 +12,7 @@ import {
   Pressable,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import firestore from '@react-native-firebase/firestore';
+import {getUserDocs, deleteUserDoc} from '../../utils/FirestoreService';
 import LookbookCard from '../../components/LookbookCard';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {
@@ -34,17 +34,8 @@ const Lookbooks = () => {
 
   const fetchLookbooks = async () => {
     try {
-      const querySnapshot = await firestore()
-        .collection('lookbooks')
-        .orderBy('timestamp', 'desc')
-        .get();
-
-      const lookbooksData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setLookbooks(lookbooksData);
+      const {docs} = await getUserDocs('lookbooks');
+      setLookbooks(docs);
     } catch (error) {
       console.error('Error fetching lookbooks:', error);
     } finally {
@@ -120,7 +111,7 @@ const Lookbooks = () => {
             try {
               await Promise.all(
                 selectedLookbooks.map(lookbook =>
-                  firestore().collection('lookbooks').doc(lookbook.id).delete(),
+                  deleteUserDoc('lookbooks', lookbook.id),
                 ),
               );
 

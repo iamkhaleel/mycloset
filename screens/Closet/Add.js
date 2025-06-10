@@ -178,6 +178,8 @@ const AddItem = () => {
 
       // Save to Firestore with all the item data
       await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
         .collection('items')
         .add({
           name,

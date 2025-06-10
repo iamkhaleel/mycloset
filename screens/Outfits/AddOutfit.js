@@ -14,8 +14,8 @@ import {
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import firestore from '@react-native-firebase/firestore';
-import storage from '@react-native-firebase/storage';
+import {addUserDoc, getUserDocs} from '../../utils/FirestoreService';
+import auth from '@react-native-firebase/auth';
 
 const AddOutfit = () => {
   const navigation = useNavigation();
@@ -32,34 +32,12 @@ const AddOutfit = () => {
 
   const fetchClosetItems = async () => {
     try {
-      const querySnapshot = await firestore().collection('items').get();
-      const items = await Promise.all(
-        querySnapshot.docs.map(async doc => {
-          const data = doc.data();
-          let imageUrl = null;
-
-          if (data.imageBase64) {
-            imageUrl = `data:image/jpeg;base64,${data.imageBase64}`;
-          } else if (data.imagePath) {
-            try {
-              imageUrl = await storage().ref(data.imagePath).getDownloadURL();
-            } catch (error) {
-              console.error('Error fetching image URL:', error);
-            }
-          }
-
-          return {
-            id: doc.id,
-            ...data,
-            imageUrl,
-          };
-        }),
-      );
-      setClosetItems(items);
-      setLoading(false);
+      const {docs} = await getUserDocs('items');
+      setClosetItems(docs);
     } catch (error) {
       console.error('Error fetching items:', error);
       Alert.alert('Error', 'Failed to load closet items');
+    } finally {
       setLoading(false);
     }
   };
@@ -87,23 +65,14 @@ const AddOutfit = () => {
 
     try {
       setSaving(true);
+      const outfitData = {
+        name: name.trim(),
+        description: description.trim(),
+        items: selectedItems.map(item => item.id),
+        createdAt: new Date().toISOString(),
+      };
 
-      // Clean and validate items data before saving
-      const cleanedItems = selectedItems.map(item => ({
-        id: item.id || '',
-        name: item.name || 'Unnamed Item',
-        category: item.category || 'Uncategorized',
-        imageUrl: item.imageUrl || null,
-      }));
-
-      await firestore()
-        .collection('outfits')
-        .add({
-          name: name.trim() || '',
-          description: description.trim() || '',
-          items: cleanedItems,
-          timestamp: firestore.FieldValue.serverTimestamp(),
-        });
+      await addUserDoc('outfits', outfitData);
 
       navigation.goBack();
     } catch (error) {

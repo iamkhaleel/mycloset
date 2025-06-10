@@ -12,7 +12,7 @@ import {
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import firestore from '@react-native-firebase/firestore';
+import {addUserDoc, getUserDocs} from '../../utils/FirestoreService';
 import OutfitCard from '../../components/OutfitCard';
 
 const THEMES = [
@@ -42,35 +42,12 @@ const AddLookbook = () => {
 
   const fetchOutfits = async () => {
     try {
-      const querySnapshot = await firestore()
-        .collection('outfits')
-        .orderBy('timestamp', 'desc')
-        .get();
-
-      const outfitsData = await Promise.all(
-        querySnapshot.docs.map(async doc => {
-          const data = doc.data();
-          const items = data.items || [];
-
-          // Process each item in the outfit to ensure valid image URLs
-          const processedItems = items.map(item => ({
-            ...item,
-            imageUrl: item.imageUrl || null, // Ensure imageUrl exists or set to null
-          }));
-
-          return {
-            id: doc.id,
-            ...data,
-            items: processedItems,
-          };
-        }),
-      );
-
-      setOutfits(outfitsData);
-      setLoading(false);
+      const {docs} = await getUserDocs('outfits');
+      setOutfits(docs);
     } catch (error) {
       console.error('Error fetching outfits:', error);
       Alert.alert('Error', 'Failed to load outfits');
+    } finally {
       setLoading(false);
     }
   };
@@ -99,19 +76,15 @@ const AddLookbook = () => {
     try {
       setSaving(true);
 
-      await firestore()
-        .collection('lookbooks')
-        .add({
-          name: name.trim(),
-          description: description.trim(),
-          theme: theme || null,
-          outfits: selectedOutfits.map(outfit => ({
-            id: outfit.id,
-            name: outfit.name || '',
-            items: outfit.items || [],
-          })),
-          timestamp: firestore.FieldValue.serverTimestamp(),
-        });
+      const lookbookData = {
+        name: name.trim(),
+        description: description.trim(),
+        theme: theme || null,
+        outfits: selectedOutfits.map(outfit => outfit.id),
+        createdAt: new Date().toISOString(),
+      };
+
+      await addUserDoc('lookbooks', lookbookData);
 
       navigation.goBack();
     } catch (error) {

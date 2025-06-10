@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
-import firestore from '@react-native-firebase/firestore';
+import {getUserDocs, deleteUserDoc} from '../../utils/FirestoreService';
 import OutfitCard from '../../components/OutfitCard';
 import {
   checkPremiumStatus,
@@ -34,17 +34,8 @@ const Outfits = () => {
 
   const fetchOutfits = async () => {
     try {
-      const querySnapshot = await firestore()
-        .collection('outfits')
-        .orderBy('timestamp', 'desc')
-        .get();
-
-      const outfitsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setOutfits(outfitsData);
+      const {docs} = await getUserDocs('outfits');
+      setOutfits(docs);
     } catch (error) {
       console.error('Error fetching outfits:', error);
     } finally {
@@ -118,7 +109,7 @@ const Outfits = () => {
             try {
               await Promise.all(
                 selectedOutfits.map(outfit =>
-                  firestore().collection('outfits').doc(outfit.id).delete(),
+                  deleteUserDoc('outfits', outfit.id),
                 ),
               );
 

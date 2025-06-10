@@ -49,17 +49,27 @@ const Settings = () => {
         return;
       }
 
-      const outfitsSnapshot = await firestore().collection('outfits').get();
-      const lookbooksSnapshot = await firestore().collection('lookbooks').get();
-      const itemsSnapshot = await firestore().collection('items').get();
-      const closetItemsSnapshot = await firestore()
-        .collection('closetItems')
+      // Fetch counts from user subcollections
+      const outfitsSnapshot = await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('outfits')
+        .get();
+      const lookbooksSnapshot = await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('lookbooks')
+        .get();
+      const itemsSnapshot = await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('items')
         .get();
 
       setCounts({
         outfits: outfitsSnapshot.size,
         lookbooks: lookbooksSnapshot.size,
-        items: itemsSnapshot.size + closetItemsSnapshot.size,
+        items: itemsSnapshot.size,
       });
     } catch (error) {
       console.error('Error fetching counts:', error);

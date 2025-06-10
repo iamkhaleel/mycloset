@@ -12,12 +12,10 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import ResponsiveButton from '../../components/Button';
-import {useState} from 'react';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-} from '@react-native-firebase/auth';
-import {firestore} from '@react-native-firebase/firestore';
+import {useState, useEffect} from 'react';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -27,6 +25,12 @@ const SignUp = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const {width, height} = Dimensions.get('window');
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: 'YOUR_WEB_CLIENT_ID',
+    });
+  }, []);
 
   const handleGoback = () => {
     navigation.goBack();
@@ -45,7 +49,7 @@ const SignUp = () => {
 
     try {
       setLoading(true);
-      const userCredential = await getAuth().createUserWithEmailAndPassword(
+      const userCredential = await auth().createUserWithEmailAndPassword(
         email,
         password,
       );
@@ -67,6 +71,39 @@ const SignUp = () => {
       Alert.alert('Error', error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const {idToken} = await GoogleSignin.signIn();
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      const userCredential = await auth().signInWithCredential(
+        googleCredential,
+      );
+
+      // Create user document if it doesn't exist
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(userCredential.user.uid)
+        .get();
+      if (!userDoc.exists) {
+        await firestore().collection('users').doc(userCredential.user.uid).set({
+          email: userCredential.user.email,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+          isPremium: false,
+          premiumExpiryDate: null,
+        });
+      }
+
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Main'}],
+      });
+    } catch (error) {
+      console.error('Google Sign-in error:', error);
+      Alert.alert('Error', 'Failed to sign in with Google');
     }
   };
 
@@ -190,7 +227,9 @@ const SignUp = () => {
 
         <View style={{flexDirection: 'row', justifyContent: 'center', gap: 15}}>
           {/* Google */}
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity
+            style={styles.socialButton}
+            onPress={handleGoogleSignUp}>
             <Image
               source={require('../../assets/images/google-logo.png')}
               style={{width: 18, height: 18}}

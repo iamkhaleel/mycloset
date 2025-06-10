@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   featuresContainer: {
     flex: 1,
     justifyContent: 'center',
+    marginBottom: 20,
   },
   featureCard: {
     flexDirection: 'row',
