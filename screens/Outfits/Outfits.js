@@ -10,6 +10,7 @@ import {
   Alert,
   Modal,
   Pressable,
+  SafeAreaView,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
@@ -129,136 +130,162 @@ const Outfits = () => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        {isSelectionMode ? (
-          <View style={styles.selectionHeader}>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => {
-                setIsSelectionMode(false);
-                setSelectedOutfits([]);
-              }}>
-              <View style={styles.iconButton}>
-                <Ionicons name="close" size={22} color="#000" />
-              </View>
-            </TouchableOpacity>
-            <View style={styles.selectionInfo}>
-              <Text style={styles.selectionCount}>
-                {selectedOutfits.length}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          {isSelectionMode ? (
+            <>
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={() => {
+                  setIsSelectionMode(false);
+                  setSelectedOutfits([]);
+                }}>
+                <Ionicons name="close" size={24} color="#000" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>
+                {selectedOutfits.length} selected
               </Text>
-              <Text style={styles.selectionText}>selected</Text>
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={handleDeleteSelected}>
+                <Ionicons name="trash-outline" size={24} color="#000" />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Text style={styles.headerTitle}>Outfits</Text>
+              <View style={styles.headerRight}>
+                <TouchableOpacity
+                  style={styles.headerButton}
+                  onPress={() => setMenuVisible(true)}>
+                  <Ionicons name="ellipsis-horizontal" size={24} color="#000" />
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </View>
+
+        {!isPremium && outfits.length > 0 && (
+          <View style={styles.limitBanner}>
+            <View style={styles.limitInfo}>
+              <Text style={styles.limitTitle}>Free Plan</Text>
+              <Text style={styles.limitText}>
+                {outfits.length}/{FREE_TIER_LIMITS.MAX_OUTFITS} Outfits
+              </Text>
+              <View style={styles.progressBar}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${
+                        (outfits.length / FREE_TIER_LIMITS.MAX_OUTFITS) * 100
+                      }%`,
+                    },
+                  ]}
+                />
+              </View>
             </View>
             <TouchableOpacity
-              style={[styles.headerButton, styles.deleteButton]}
-              onPress={handleDeleteSelected}>
-              <View style={styles.iconButton}>
-                <Ionicons name="trash-outline" size={22} color="#FF3B30" />
-              </View>
+              onPress={() => navigation.navigate('SubscriptionIntro')}
+              style={styles.upgradeButton}>
+              <Text style={styles.upgradeButtonText}>Upgrade</Text>
             </TouchableOpacity>
           </View>
-        ) : (
-          <>
-            <Text style={styles.headerTitle}>Outfits</Text>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => setMenuVisible(true)}>
-              <Ionicons name="ellipsis-vertical" size={24} color="#000" />
-            </TouchableOpacity>
-          </>
         )}
-      </View>
 
-      {!isPremium && outfits.length > 0 && (
-        <View style={styles.limitContainer}>
-          <Text style={styles.limitText}>
-            {outfits.length}/{FREE_TIER_LIMITS.MAX_OUTFITS} Outfits Used
-          </Text>
+        <ScrollView
+          style={styles.scrollContent}
+          contentContainerStyle={styles.scrollContentContainer}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          {outfits.length > 0 ? (
+            outfits.map(outfit => (
+              <OutfitCard
+                key={outfit.id}
+                outfit={outfit}
+                onPress={() => handleOutfitPress(outfit)}
+                onLongPress={() => handleLongPress(outfit)}
+                isSelected={selectedOutfits.some(
+                  selected => selected.id === outfit.id,
+                )}
+              />
+            ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="shirt-outline" size={48} color="#ccc" />
+              <Text style={styles.emptyText}>No outfits yet</Text>
+              <Text style={styles.emptySubText}>
+                Create your first outfit by combining items from your closet
+              </Text>
+              <TouchableOpacity
+                style={styles.createButton}
+                onPress={handleAddOutfit}>
+                <Text style={styles.createButtonText}>Create Outfit</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </ScrollView>
+
+        {outfits.length > 0 && (
           <TouchableOpacity
-            onPress={() => navigation.navigate('SubscriptionIntro')}
-            style={styles.upgradeButton}>
-            <Text style={styles.upgradeButtonText}>Upgrade for Unlimited</Text>
+            style={styles.floatingBtn}
+            onPress={handleAddOutfit}>
+            <Text style={styles.floatingText}>+ Add Outfit</Text>
           </TouchableOpacity>
-        </View>
-      )}
-
-      <ScrollView
-        style={styles.content}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        {outfits.length > 0 ? (
-          outfits.map(outfit => (
-            <OutfitCard
-              key={outfit.id}
-              outfit={outfit}
-              onPress={() => handleOutfitPress(outfit)}
-              onLongPress={() => handleLongPress(outfit)}
-              isSelected={selectedOutfits.some(
-                selected => selected.id === outfit.id,
-              )}
-            />
-          ))
-        ) : (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No outfits yet</Text>
-            <Text style={styles.emptySubText}>
-              Create your first outfit by combining items from your closet
-            </Text>
-          </View>
         )}
-      </ScrollView>
 
-      <TouchableOpacity style={styles.floatingBtn} onPress={handleAddOutfit}>
-        <Text style={styles.floatingText}>+ Add Outfit</Text>
-      </TouchableOpacity>
+        <Modal
+          transparent={true}
+          visible={menuVisible}
+          animationType="fade"
+          onRequestClose={() => setMenuVisible(false)}>
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setMenuVisible(false)}>
+            <View style={styles.menuContent}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setMenuVisible(false);
+                  setIsSelectionMode(true);
+                }}>
+                <Ionicons name="checkbox-outline" size={24} color="#000" />
+                <Text style={styles.menuText}>Select Multiple</Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Modal>
 
-      <Modal
-        transparent={true}
-        visible={menuVisible}
-        animationType="fade"
-        onRequestClose={() => setMenuVisible(false)}>
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setMenuVisible(false)}>
-          <View style={styles.menuContent}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                setIsSelectionMode(true);
-              }}>
-              <Ionicons name="checkbox-outline" size={24} color="#000" />
-              <Text style={styles.menuText}>Select Multiple</Text>
-            </TouchableOpacity>
-          </View>
-        </Pressable>
-      </Modal>
-
-      <PremiumModal
-        visible={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        onUpgrade={() => {
-          setShowPremiumModal(false);
-          navigation.navigate('SubscriptionIntro');
-        }}
-        featureName="Unlimited Outfits"
-      />
-    </View>
+        <PremiumModal
+          visible={showPremiumModal}
+          onClose={() => setShowPremiumModal(false)}
+          onUpgrade={() => {
+            setShowPremiumModal(false);
+            navigation.navigate('SubscriptionIntro');
+          }}
+          featureName="Unlimited Outfits"
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f8f8',
+  },
+  content: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -270,85 +297,130 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  selectionHeader: {
-    flex: 1,
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#000',
+  },
+  headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
   },
   headerButton: {
     padding: 8,
   },
-  iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+  scrollContent: {
+    flex: 1,
   },
-  deleteButton: {
-    marginLeft: 'auto',
+  scrollContentContainer: {
+    paddingVertical: 16,
   },
-  selectionInfo: {
+  limitBanner: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 2,
+  },
+  limitInfo: {
+    flex: 1,
+  },
+  limitTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 4,
+  },
+  limitText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 8,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: '#eee',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#000',
+  },
+  upgradeButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
     marginLeft: 16,
   },
-  selectionCount: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 8,
-  },
-  selectionText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    paddingTop: 16,
+  upgradeButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
-    marginTop: '50%',
+    paddingHorizontal: 32,
+    paddingTop: '40%',
   },
   emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#000',
+    marginTop: 16,
     marginBottom: 8,
   },
   emptySubText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
     textAlign: 'center',
+    marginBottom: 24,
+  },
+  createButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  createButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
   },
   floatingBtn: {
     position: 'absolute',
-    bottom: 40,
-    right: 25,
+    bottom: 32,
+    right: 32,
     backgroundColor: '#000',
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
     elevation: 5,
   },
   floatingText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    fontSize: 16,
   },
   modalOverlay: {
     flex: 1,
@@ -359,9 +431,16 @@ const styles = StyleSheet.create({
     top: 60,
     right: 20,
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
     elevation: 5,
-    minWidth: 180,
+    minWidth: 200,
   },
   menuItem: {
     flexDirection: 'row',
@@ -371,31 +450,12 @@ const styles = StyleSheet.create({
   menuText: {
     marginLeft: 12,
     fontSize: 16,
+    color: '#000',
   },
-  limitContainer: {
-    backgroundColor: '#f8f8f8',
-    margin: 16,
-    padding: 15,
-    borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  limitText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  upgradeButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  upgradeButtonText: {
-    color: '#fff',
-    fontWeight: '600',
   },
 });
 

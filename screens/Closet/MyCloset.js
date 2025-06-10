@@ -505,12 +505,12 @@ const styles = StyleSheet.create({
   filterBar: {
     paddingVertical: 10,
     paddingHorizontal: 10,
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent', // Removed black background
   },
   filterBtn: {
-    marginRight: 10,
+    marginRight: 8, // Reduced margin
     paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12, // Reduced padding
     backgroundColor: '#eee',
     borderRadius: 12,
     height: 35,
@@ -521,8 +521,8 @@ const styles = StyleSheet.create({
   },
   floatingBtn: {
     position: 'absolute',
-    bottom: 40,
-    right: 25,
+    bottom: 30, // Adjusted position
+    right: 20, // Adjusted position
     backgroundColor: '#000',
     borderRadius: 16,
     paddingVertical: 10,
@@ -545,22 +545,22 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 12,
-    marginRight: 10,
+    marginRight: 8, // Reduced margin
   },
   itemsGrid: {
-    padding: 10,
+    padding: 5, // Reduced padding
   },
   itemContainer: {
     flex: 1,
-    margin: 8,
+    margin: 4, // Reduced margin
     backgroundColor: '#fff',
     borderRadius: 10,
     overflow: 'hidden',
     elevation: 2,
-    maxWidth: '46%', // Approximately half width minus margins
+    maxWidth: '48%', // Adjusted width
   },
   itemImage: {
-    width: '200',
+    width: '100%', // Adjusted width
     height: 150,
     backgroundColor: '#f0f0f0',
   },
@@ -668,7 +668,6 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   header: {
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     paddingVertical: 8,

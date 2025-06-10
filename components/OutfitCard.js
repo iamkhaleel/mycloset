@@ -3,7 +3,6 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
 const OutfitCard = ({outfit, onPress, onLongPress, isSelected}) => {
-  // Ensure items array exists
   const itemCount = outfit.items?.length || 0;
 
   return (
@@ -13,17 +12,30 @@ const OutfitCard = ({outfit, onPress, onLongPress, isSelected}) => {
       onLongPress={onLongPress}
       delayLongPress={500}>
       <View style={styles.content}>
-        <Text style={styles.name} numberOfLines={1}>
-          {outfit.name || 'Unnamed Outfit'}
-        </Text>
-        <Text style={styles.itemCount}>
-          {itemCount} {itemCount === 1 ? 'item' : 'items'}
-        </Text>
-        {isSelected && (
-          <View style={styles.checkmarkContainer}>
-            <Ionicons name="checkmark-circle" size={24} color="#000" />
-          </View>
-        )}
+        <View style={styles.details}>
+          <Text style={styles.name} numberOfLines={1}>
+            {outfit.name || 'Unnamed Outfit'}
+          </Text>
+          {outfit.description && (
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.description} numberOfLines={1}>
+                {outfit.description}
+              </Text>
+            </View>
+          )}
+          <Text style={styles.count}>
+            {itemCount} {itemCount === 1 ? 'item' : 'items'}
+          </Text>
+        </View>
+        <View style={styles.iconContainer}>
+          {isSelected ? (
+            <View style={styles.checkmarkContainer}>
+              <Ionicons name="checkmark-circle" size={24} color="#000" />
+            </View>
+          ) : (
+            <Ionicons name="chevron-forward" size={24} color="#ccc" />
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -32,37 +44,56 @@ const OutfitCard = ({outfit, onPress, onLongPress, isSelected}) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
     marginHorizontal: 16,
     marginBottom: 12,
     elevation: 2,
-    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   selectedContainer: {
+    backgroundColor: '#f8f8f8',
     borderWidth: 2,
     borderColor: '#000',
   },
   content: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
-    position: 'relative',
+  },
+  details: {
+    flex: 1,
   },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#000',
   },
-  itemCount: {
+  descriptionContainer: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  description: {
     fontSize: 14,
     color: '#666',
   },
+  count: {
+    fontSize: 14,
+    color: '#888',
+  },
+  iconContainer: {
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
   checkmarkContainer: {
-    position: 'absolute',
-    right: 16,
-    top: '50%',
-    transform: [{translateY: -12}],
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 4,
+    borderRadius: 12,
+    padding: 2,
   },
 });
 

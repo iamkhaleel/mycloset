@@ -164,32 +164,49 @@ const Lookbooks = () => {
           ) : (
             <>
               <Text style={styles.headerTitle}>Lookbooks</Text>
-              <TouchableOpacity
-                style={styles.headerButton}
-                onPress={() => setMenuVisible(true)}>
-                <Ionicons name="ellipsis-vertical" size={24} color="#000" />
-              </TouchableOpacity>
+              <View style={styles.headerRight}>
+                <TouchableOpacity
+                  style={styles.headerButton}
+                  onPress={() => setMenuVisible(true)}>
+                  <Ionicons name="ellipsis-horizontal" size={24} color="#000" />
+                </TouchableOpacity>
+              </View>
             </>
           )}
         </View>
 
         {!isPremium && lookbooks.length > 0 && (
-          <View style={styles.limitContainer}>
-            <Text style={styles.limitText}>
-              {lookbooks.length}/{FREE_TIER_LIMITS.MAX_LOOKBOOKS} Lookbooks Used
-            </Text>
+          <View style={styles.limitBanner}>
+            <View style={styles.limitInfo}>
+              <Text style={styles.limitTitle}>Free Plan</Text>
+              <Text style={styles.limitText}>
+                {lookbooks.length}/{FREE_TIER_LIMITS.MAX_LOOKBOOKS} Lookbooks
+              </Text>
+              <View style={styles.progressBar}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${
+                        (lookbooks.length / FREE_TIER_LIMITS.MAX_LOOKBOOKS) *
+                        100
+                      }%`,
+                    },
+                  ]}
+                />
+              </View>
+            </View>
             <TouchableOpacity
               onPress={() => navigation.navigate('SubscriptionIntro')}
               style={styles.upgradeButton}>
-              <Text style={styles.upgradeButtonText}>
-                Upgrade for Unlimited
-              </Text>
+              <Text style={styles.upgradeButtonText}>Upgrade</Text>
             </TouchableOpacity>
           </View>
         )}
 
         <ScrollView
-          style={styles.content}
+          style={styles.scrollContent}
+          contentContainerStyle={styles.scrollContentContainer}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }>
@@ -207,19 +224,27 @@ const Lookbooks = () => {
             ))
           ) : (
             <View style={styles.emptyContainer}>
+              <Ionicons name="book-outline" size={48} color="#ccc" />
               <Text style={styles.emptyText}>No lookbooks yet</Text>
               <Text style={styles.emptySubText}>
                 Create your first lookbook by combining your favorite outfits
               </Text>
+              <TouchableOpacity
+                style={styles.createButton}
+                onPress={handleAddLookbook}>
+                <Text style={styles.createButtonText}>Create Lookbook</Text>
+              </TouchableOpacity>
             </View>
           )}
         </ScrollView>
 
-        <TouchableOpacity
-          style={styles.floatingBtn}
-          onPress={handleAddLookbook}>
-          <Text style={styles.floatingText}>+ Add Lookbook</Text>
-        </TouchableOpacity>
+        {lookbooks.length > 0 && (
+          <TouchableOpacity
+            style={styles.floatingBtn}
+            onPress={handleAddLookbook}>
+            <Text style={styles.floatingText}>+ Add Lookbook</Text>
+          </TouchableOpacity>
+        )}
 
         <Modal
           transparent={true}
@@ -260,7 +285,7 @@ const Lookbooks = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f8f8f8',
   },
   content: {
     flex: 1,
@@ -276,47 +301,123 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#000',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   headerButton: {
     padding: 8,
   },
-  loadingContainer: {
+  scrollContent: {
     flex: 1,
-    justifyContent: 'center',
+  },
+  scrollContentContainer: {
+    paddingVertical: 16,
+  },
+  limitBanner: {
+    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 2,
+  },
+
+  limitInfo: {
+    flex: 1,
+  },
+  limitTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 4,
+  },
+  limitText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 8,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: '#eee',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#000',
+  },
+  upgradeButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginLeft: 16,
+  },
+  upgradeButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
-    marginTop: '50%',
+    paddingHorizontal: 32,
+    paddingTop: '40%',
   },
   emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#000',
+    marginTop: 16,
     marginBottom: 8,
   },
   emptySubText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
     textAlign: 'center',
+    marginBottom: 24,
+  },
+  createButton: {
+    backgroundColor: '#000',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  createButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
   },
   floatingBtn: {
     position: 'absolute',
-    bottom: 40,
-    right: 25,
+    bottom: 32,
+    right: 32,
     backgroundColor: '#000',
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 24,
     elevation: 5,
   },
   floatingText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    fontSize: 16,
   },
   modalOverlay: {
     flex: 1,
@@ -327,9 +428,16 @@ const styles = StyleSheet.create({
     top: 60,
     right: 20,
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
     elevation: 5,
-    minWidth: 180,
+    minWidth: 200,
   },
   menuItem: {
     flexDirection: 'row',
@@ -339,35 +447,12 @@ const styles = StyleSheet.create({
   menuText: {
     marginLeft: 12,
     fontSize: 16,
+    color: '#000',
   },
-  limitContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#f8f8f8',
-    marginHorizontal: 16,
-    marginVertical: 12,
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  limitText: {
-    fontSize: 14,
-    color: '#666',
+  loadingContainer: {
     flex: 1,
-  },
-  upgradeButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginLeft: 12,
-  },
-  upgradeButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
 const LookbookCard = ({lookbook, onPress, onLongPress, isSelected}) => {
@@ -9,62 +9,30 @@ const LookbookCard = ({lookbook, onPress, onLongPress, isSelected}) => {
       onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={500}>
-      <View style={styles.imageContainer}>
-        {lookbook.coverImage ? (
-          <Image
-            source={{uri: lookbook.coverImage}}
-            style={styles.coverImage}
-          />
-        ) : lookbook.outfits && lookbook.outfits.length > 0 ? (
-          // If no cover image, show a grid of outfit images
-          <View style={styles.outfitsGrid}>
-            {lookbook.outfits.slice(0, 4).map((outfit, index) => (
-              <View
-                key={`${outfit.id || index}`}
-                style={[
-                  styles.gridItem,
-                  index % 2 === 1 && styles.rightItem,
-                  index >= 2 && styles.bottomItem,
-                ]}>
-                {outfit.items && outfit.items[0]?.imageUrl ? (
-                  <Image
-                    source={{uri: outfit.items[0].imageUrl}}
-                    style={styles.gridImage}
-                  />
-                ) : (
-                  <View style={[styles.gridImage, styles.placeholderImage]}>
-                    <Ionicons name="images-outline" size={20} color="#ccc" />
-                  </View>
-                )}
-              </View>
-            ))}
-          </View>
-        ) : (
-          <View style={styles.emptyContainer}>
-            <Ionicons name="images-outline" size={40} color="#ccc" />
-          </View>
-        )}
-        {isSelected && (
-          <View style={styles.selectionOverlay}>
+      <View style={styles.content}>
+        <View style={styles.details}>
+          <Text style={styles.name} numberOfLines={1}>
+            {lookbook.name}
+          </Text>
+          {lookbook.theme && (
+            <View style={styles.themeContainer}>
+              <Text style={styles.theme}>{lookbook.theme}</Text>
+            </View>
+          )}
+          <Text style={styles.count}>
+            {lookbook.outfits?.length || 0}{' '}
+            {(lookbook.outfits?.length || 0) === 1 ? 'outfit' : 'outfits'}
+          </Text>
+        </View>
+        <View style={styles.iconContainer}>
+          {isSelected ? (
             <View style={styles.checkmarkContainer}>
               <Ionicons name="checkmark-circle" size={24} color="#000" />
             </View>
-          </View>
-        )}
-      </View>
-      <View style={styles.details}>
-        <Text style={styles.name} numberOfLines={1}>
-          {lookbook.name}
-        </Text>
-        {lookbook.theme && (
-          <Text style={styles.theme} numberOfLines={1}>
-            {lookbook.theme}
-          </Text>
-        )}
-        <Text style={styles.count}>
-          {lookbook.outfits?.length || 0}{' '}
-          {(lookbook.outfits?.length || 0) === 1 ? 'outfit' : 'outfits'}
-        </Text>
+          ) : (
+            <Ionicons name="chevron-forward" size={24} color="#ccc" />
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -73,87 +41,56 @@ const LookbookCard = ({lookbook, onPress, onLongPress, isSelected}) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
     marginHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 12,
     elevation: 2,
-    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   selectedContainer: {
+    backgroundColor: '#f8f8f8',
     borderWidth: 2,
     borderColor: '#000',
   },
-  imageContainer: {
-    height: 200,
-    backgroundColor: '#f5f5f5',
-  },
-  coverImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  outfitsGrid: {
-    flex: 1,
-    position: 'relative',
-  },
-  gridItem: {
-    position: 'absolute',
-    width: '50%',
-    height: '50%',
-  },
-  rightItem: {
-    right: 0,
-  },
-  bottomItem: {
-    bottom: 0,
-  },
-  gridImage: {
-    width: '100%',
-    height: '100%',
-    borderWidth: 0.5,
-    borderColor: '#eee',
-  },
-  placeholderImage: {
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
+  content: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  selectionOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkmarkContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 4,
+    padding: 16,
   },
   details: {
-    padding: 12,
+    flex: 1,
   },
   name: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#000',
+  },
+  themeContainer: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
   },
   theme: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 4,
   },
   count: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#888',
+  },
+  iconContainer: {
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
+  checkmarkContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 2,
   },
 });
 
