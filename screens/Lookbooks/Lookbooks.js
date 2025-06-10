@@ -10,6 +10,7 @@ import {
   Alert,
   Modal,
   Pressable,
+  SafeAreaView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {getUserDocs, deleteUserDoc} from '../../utils/FirestoreService';
@@ -71,8 +72,7 @@ const Lookbooks = () => {
     if (isSelectionMode) {
       toggleLookbookSelection(lookbook);
     } else {
-      // TODO: Navigate to lookbook details screen
-      console.log('Lookbook pressed:', lookbook);
+      navigation.navigate('LookbookDetails', {lookbook});
     }
   };
 
@@ -132,122 +132,128 @@ const Lookbooks = () => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        {isSelectionMode ? (
-          <>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => {
-                setIsSelectionMode(false);
-                setSelectedLookbooks([]);
-              }}>
-              <Ionicons name="close" size={24} color="#000" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>
-              {selectedLookbooks.length} selected
-            </Text>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={handleDeleteSelected}>
-              <Ionicons name="trash-outline" size={24} color="#000" />
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <Text style={styles.headerTitle}>Lookbooks</Text>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => setMenuVisible(true)}>
-              <Ionicons name="ellipsis-vertical" size={24} color="#000" />
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
-
-      <ScrollView
-        style={styles.content}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        {lookbooks.length > 0 ? (
-          lookbooks.map(lookbook => (
-            <LookbookCard
-              key={lookbook.id}
-              lookbook={lookbook}
-              onPress={() => handleLookbookPress(lookbook)}
-              onLongPress={() => handleLongPress(lookbook)}
-              isSelected={selectedLookbooks.some(
-                selected => selected.id === lookbook.id,
-              )}
-            />
-          ))
-        ) : (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No lookbooks yet</Text>
-            <Text style={styles.emptySubText}>
-              Create your first lookbook by combining your favorite outfits
-            </Text>
-          </View>
-        )}
-      </ScrollView>
-
-      <TouchableOpacity style={styles.floatingBtn} onPress={handleAddLookbook}>
-        <Text style={styles.floatingText}>+ Add Lookbook</Text>
-      </TouchableOpacity>
-
-      <Modal
-        transparent={true}
-        visible={menuVisible}
-        animationType="fade"
-        onRequestClose={() => setMenuVisible(false)}>
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setMenuVisible(false)}>
-          <View style={styles.menuContent}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                setIsSelectionMode(true);
-              }}>
-              <Ionicons name="checkbox-outline" size={24} color="#000" />
-              <Text style={styles.menuText}>Select Multiple</Text>
-            </TouchableOpacity>
-          </View>
-        </Pressable>
-      </Modal>
-
-      {!isPremium && lookbooks.length > 0 && (
-        <View style={styles.limitContainer}>
-          <Text style={styles.limitText}>
-            {lookbooks.length}/{FREE_TIER_LIMITS.MAX_LOOKBOOKS} Lookbooks Used
-          </Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('SubscriptionIntro')}
-            style={styles.upgradeButton}>
-            <Text style={styles.upgradeButtonText}>Upgrade for Unlimited</Text>
-          </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          {isSelectionMode ? (
+            <>
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={() => {
+                  setIsSelectionMode(false);
+                  setSelectedLookbooks([]);
+                }}>
+                <Ionicons name="close" size={24} color="#000" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>
+                {selectedLookbooks.length} selected
+              </Text>
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={handleDeleteSelected}>
+                <Ionicons name="trash-outline" size={24} color="#000" />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Text style={styles.headerTitle}>Lookbooks</Text>
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={() => setMenuVisible(true)}>
+                <Ionicons name="ellipsis-vertical" size={24} color="#000" />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
-      )}
 
-      <PremiumModal
-        visible={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        onUpgrade={() => {
-          setShowPremiumModal(false);
-          navigation.navigate('SubscriptionIntro');
-        }}
-        featureName="Unlimited Lookbooks"
-      />
-    </View>
+        {!isPremium && lookbooks.length > 0 && (
+          <View style={styles.limitContainer}>
+            <Text style={styles.limitText}>
+              {lookbooks.length}/{FREE_TIER_LIMITS.MAX_LOOKBOOKS} Lookbooks Used
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('SubscriptionIntro')}
+              style={styles.upgradeButton}>
+              <Text style={styles.upgradeButtonText}>
+                Upgrade for Unlimited
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <ScrollView
+          style={styles.content}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          {lookbooks.length > 0 ? (
+            lookbooks.map(lookbook => (
+              <LookbookCard
+                key={lookbook.id}
+                lookbook={lookbook}
+                onPress={() => handleLookbookPress(lookbook)}
+                onLongPress={() => handleLongPress(lookbook)}
+                isSelected={selectedLookbooks.some(
+                  selected => selected.id === lookbook.id,
+                )}
+              />
+            ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No lookbooks yet</Text>
+              <Text style={styles.emptySubText}>
+                Create your first lookbook by combining your favorite outfits
+              </Text>
+            </View>
+          )}
+        </ScrollView>
+
+        <TouchableOpacity
+          style={styles.floatingBtn}
+          onPress={handleAddLookbook}>
+          <Text style={styles.floatingText}>+ Add Lookbook</Text>
+        </TouchableOpacity>
+
+        <Modal
+          transparent={true}
+          visible={menuVisible}
+          animationType="fade"
+          onRequestClose={() => setMenuVisible(false)}>
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setMenuVisible(false)}>
+            <View style={styles.menuContent}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setMenuVisible(false);
+                  setIsSelectionMode(true);
+                }}>
+                <Ionicons name="checkbox-outline" size={24} color="#000" />
+                <Text style={styles.menuText}>Select Multiple</Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Modal>
+
+        <PremiumModal
+          visible={showPremiumModal}
+          onClose={() => setShowPremiumModal(false)}
+          onUpgrade={() => {
+            setShowPremiumModal(false);
+            navigation.navigate('SubscriptionIntro');
+          }}
+          featureName="Unlimited Lookbooks"
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -255,6 +261,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
@@ -277,10 +286,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    paddingTop: 16,
   },
   emptyContainer: {
     flex: 1,
@@ -340,25 +345,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#f8f8f8',
-    margin: 20,
-    padding: 15,
+    marginHorizontal: 16,
+    marginVertical: 12,
+    padding: 12,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#eee',
   },
   limitText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
+    flex: 1,
   },
   upgradeButton: {
     backgroundColor: '#000',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginLeft: 12,
   },
   upgradeButtonText: {
     color: '#fff',
     fontWeight: '600',
+    fontSize: 12,
   },
 });
 

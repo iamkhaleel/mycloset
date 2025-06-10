@@ -71,8 +71,7 @@ const Outfits = () => {
     if (isSelectionMode) {
       toggleOutfitSelection(outfit);
     } else {
-      // TODO: Navigate to outfit details screen
-      console.log('Outfit pressed:', outfit);
+      navigation.navigate('OutfitDetails', {outfit});
     }
   };
 

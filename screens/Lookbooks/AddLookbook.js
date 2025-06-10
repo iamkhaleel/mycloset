@@ -8,12 +8,15 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  SafeAreaView,
+  Image,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {addUserDoc, getUserDocs} from '../../utils/FirestoreService';
 import OutfitCard from '../../components/OutfitCard';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const THEMES = [
   'Casual',
@@ -62,6 +65,18 @@ const AddLookbook = () => {
     }
   };
 
+  const sanitizeOutfit = outfit => {
+    // Only keep serializable, valid fields
+    return {
+      id: outfit.id,
+      name: outfit.name || '',
+      // Only store item IDs, not objects
+      items: Array.isArray(outfit.items)
+        ? outfit.items.filter(id => typeof id === 'string')
+        : [],
+    };
+  };
+
   const handleSave = async () => {
     if (!name.trim()) {
       Alert.alert('Error', 'Please enter a name for the lookbook');
@@ -75,17 +90,28 @@ const AddLookbook = () => {
 
     try {
       setSaving(true);
+      const user = auth().currentUser;
+      if (!user) throw new Error('No authenticated user');
+
+      // Sanitize all outfits before saving
+      const sanitizedOutfits = selectedOutfits.map(sanitizeOutfit);
 
       const lookbookData = {
         name: name.trim(),
-        description: description.trim(),
+        description: description.trim() || null,
         theme: theme || null,
-        outfits: selectedOutfits.map(outfit => outfit.id),
-        createdAt: new Date().toISOString(),
+        outfits: sanitizedOutfits,
+        userId: user.uid,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        updatedAt: firestore.FieldValue.serverTimestamp(),
       };
 
-      await addUserDoc('lookbooks', lookbookData);
-
+      // Save lookbook directly to user's subcollection to avoid potential issues with shared util
+      await firestore()
+        .collection('users')
+        .doc(user.uid)
+        .collection('lookbooks')
+        .add(lookbookData);
       navigation.goBack();
     } catch (error) {
       console.error('Error saving lookbook:', error);

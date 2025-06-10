@@ -20,7 +20,7 @@ const LookbookCard = ({lookbook, onPress, onLongPress, isSelected}) => {
           <View style={styles.outfitsGrid}>
             {lookbook.outfits.slice(0, 4).map((outfit, index) => (
               <View
-                key={outfit.id}
+                key={`${outfit.id || index}`}
                 style={[
                   styles.gridItem,
                   index % 2 === 1 && styles.rightItem,

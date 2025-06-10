@@ -34,6 +34,11 @@ const ItemDetails = ({route}) => {
       <View style={styles.imageContainer}>
         {item.imageUrl ? (
           <Image source={{uri: item.imageUrl}} style={styles.itemImage} />
+        ) : item.imageBase64 ? (
+          <Image
+            source={{uri: `data:image/jpeg;base64,${item.imageBase64}`}}
+            style={styles.itemImage}
+          />
         ) : (
           <View style={[styles.itemImage, styles.placeholderImage]}>
             <Ionicons name="image" size={60} color="#ccc" />

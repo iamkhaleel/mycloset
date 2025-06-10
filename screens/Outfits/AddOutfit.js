@@ -14,7 +14,7 @@ import {
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {addUserDoc, getUserDocs} from '../../utils/FirestoreService';
+import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
 const AddOutfit = () => {
@@ -32,8 +32,29 @@ const AddOutfit = () => {
 
   const fetchClosetItems = async () => {
     try {
-      const {docs} = await getUserDocs('items');
-      setClosetItems(docs);
+      setLoading(true);
+      const user = auth().currentUser;
+      if (!user) throw new Error('No authenticated user');
+
+      const querySnapshot = await firestore()
+        .collection('users')
+        .doc(user.uid)
+        .collection('items')
+        .get();
+
+      const items = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Sort by createdAt or timestamp (descending), similar to MyCloset
+      items.sort((a, b) => {
+        const aDate = a.createdAt?.toDate?.() || a.timestamp?.toDate?.() || 0;
+        const bDate = b.createdAt?.toDate?.() || b.timestamp?.toDate?.() || 0;
+        return bDate - aDate;
+      });
+
+      setClosetItems(items);
     } catch (error) {
       console.error('Error fetching items:', error);
       Alert.alert('Error', 'Failed to load closet items');
@@ -72,7 +93,15 @@ const AddOutfit = () => {
         createdAt: new Date().toISOString(),
       };
 
-      await addUserDoc('outfits', outfitData);
+      // Save to Firestore directly instead of using addUserDoc
+      const user = auth().currentUser;
+      if (!user) throw new Error('No authenticated user');
+
+      await firestore()
+        .collection('users')
+        .doc(user.uid)
+        .collection('outfits')
+        .add(outfitData);
 
       navigation.goBack();
     } catch (error) {
@@ -93,6 +122,13 @@ const AddOutfit = () => {
       onPress={() => toggleItemSelection(item)}>
       {item.imageUrl ? (
         <Image source={{uri: item.imageUrl}} style={styles.itemImage} />
+      ) : item.imageBase64 ? (
+        <Image
+          source={{uri: `data:image/jpeg;base64,${item.imageBase64}`}}
+          style={styles.itemImage}
+        />
+      ) : item.selectedImage ? (
+        <Image source={{uri: item.selectedImage}} style={styles.itemImage} />
       ) : (
         <View style={[styles.itemImage, styles.placeholderImage]}>
           <Ionicons name="image" size={40} color="#ccc" />
@@ -157,7 +193,12 @@ const AddOutfit = () => {
               {selectedItems.map(item => (
                 <View key={item.id} style={styles.selectedItemPreview}>
                   <Image
-                    source={{uri: item.imageUrl}}
+                    source={{
+                      uri:
+                        item.imageUrl || item.imageBase64
+                          ? `data:image/jpeg;base64,${item.imageBase64}`
+                          : item.selectedImage,
+                    }}
                     style={styles.previewImage}
                   />
                   <TouchableOpacity
