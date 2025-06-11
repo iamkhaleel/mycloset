@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  Platform,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import ResponsiveButton from '../../components/Button';
@@ -16,6 +17,9 @@ import {useState, useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import Ionicons from '@react-native-vector-icons/ionicons';
+
+const {width, height} = Dimensions.get('window');
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -24,6 +28,8 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {width, height} = Dimensions.get('window');
 
   useEffect(() => {
@@ -120,6 +126,7 @@ const SignUp = () => {
             height: 32,
             marginStart: '3%',
             marginTop: '0%',
+            tintColor: '#FFD66B',
           }}
         />
       </TouchableOpacity>
@@ -131,6 +138,7 @@ const SignUp = () => {
           style={{
             width: 120,
             height: 120,
+            borderRadius: 100,
           }}
         />
       </View>
@@ -141,16 +149,19 @@ const SignUp = () => {
 
       {/* Email */}
       <View style={{marginTop: 5, width: '95%'}}>
-        <Text style={{margin: 2, fontSize: 16, color: '#333'}}>Email</Text>
+        <Text style={{margin: 2, fontSize: 16, color: '#FFD66B'}}>Email</Text>
         <View style={styles.inputBox}>
-          <Image
-            source={require('../../assets/images/email.png')}
-            style={styles.inputIcon}
+          <Ionicons
+            name="mail-outline"
+            size={20}
+            color="black"
+            style={{marginRight: 10}}
           />
+
           <TextInput
             style={styles.inputText}
             placeholder="Enter your Email Address"
-            placeholderTextColor="#aaa"
+            placeholderTextColor="black"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -161,41 +172,64 @@ const SignUp = () => {
 
       {/* Password */}
       <View style={{marginTop: 5, width: '95%'}}>
-        <Text style={{margin: 5, fontSize: 16, color: '#333'}}>Password</Text>
+        <Text style={{margin: 5, fontSize: 16, color: '#FFD66B'}}>
+          Password
+        </Text>
         <View style={styles.inputBox}>
-          <Image
-            source={require('../../assets/images/padlock-fill.png')}
-            style={styles.inputIcon}
+          <Ionicons
+            name="lock-closed-outline"
+            size={20}
+            color="black"
+            style={{marginRight: 10}}
           />
           <TextInput
             style={styles.inputText}
             placeholder="Enter your password"
-            placeholderTextColor="#aaa"
-            secureTextEntry
+            placeholderTextColor="black"
+            secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
           />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? 'eye' : 'eye-off'}
+              size={20}
+              color="black"
+              style={{marginLeft: 5}}
+            />
+          </TouchableOpacity>
         </View>
       </View>
 
       {/* Confirm Password */}
       <View style={{marginTop: 5, width: '95%'}}>
-        <Text style={{margin: 5, fontSize: 16, color: '#333'}}>
+        <Text style={{margin: 5, fontSize: 16, color: '#FFD66B'}}>
           Re-Enter Password
         </Text>
         <View style={styles.inputBox}>
-          <Image
-            source={require('../../assets/images/padlock-fill.png')}
-            style={styles.inputIcon}
+          <Ionicons
+            name="lock-closed-outline"
+            size={20}
+            color="black"
+            style={{marginRight: 10}}
           />
           <TextInput
             style={styles.inputText}
             placeholder="Confirm your password"
-            placeholderTextColor="#aaa"
-            secureTextEntry
+            placeholderTextColor="black"
+            secureTextEntry={!showConfirmPassword}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
           />
+          <TouchableOpacity
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <Ionicons
+              name={showConfirmPassword ? 'eye' : 'eye-off'}
+              size={20}
+              color="black"
+              style={{marginLeft: 5}}
+            />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -208,7 +242,7 @@ const SignUp = () => {
         </TouchableOpacity>
         <Text style={styles.checkboxText}>Remember Me</Text>
         <TouchableOpacity>
-          <Text style={{fontWeight: 'bold', marginStart: 40}}>
+          <Text style={{fontWeight: 'bold', marginStart: 40, color: '#FFD66B'}}>
             Forgot Password?
           </Text>
         </TouchableOpacity>
@@ -216,9 +250,18 @@ const SignUp = () => {
 
       {/* Sign Up Button */}
       {loading ? (
-        <ActivityIndicator size="large" color="#000" style={{marginTop: 6}} />
+        <ActivityIndicator
+          size="large"
+          color="#FFD66B"
+          style={{marginTop: 6}}
+        />
       ) : (
-        <ResponsiveButton title="Sign Up" onPress={handleSignUp} />
+        <ResponsiveButton
+          title="Sign Up"
+          onPress={handleSignUp}
+          buttonStyle={styles.signUpButton}
+          textStyle={styles.signUpButtonText}
+        />
       )}
 
       {/* Divider */}
@@ -234,7 +277,7 @@ const SignUp = () => {
               source={require('../../assets/images/google-logo.png')}
               style={{width: 18, height: 18}}
             />
-            <Text style={{color: '#333'}}>Google</Text>
+            <Text style={{color: '#222831'}}>Google</Text>
           </TouchableOpacity>
 
           {/* Apple */}
@@ -244,7 +287,7 @@ const SignUp = () => {
               style={{width: 16, height: 16}}
               resizeMode="contain"
             />
-            <Text style={{color: '#333'}}>Apple</Text>
+            <Text style={{color: '#222831'}}>Apple</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -258,21 +301,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
   },
   logo: {
-    alignContent: 'center',
-    justifyContent: 'center',
     alignSelf: 'center',
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 6,
+    color: '#FFD66B',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#FFD66B',
     marginBottom: 6,
     textAlign: 'center',
   },
@@ -284,19 +327,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 5,
     paddingVertical: 2,
-    backgroundColor: '#fff',
+    backgroundColor: '#f2faff',
   },
   inputIcon: {
     width: 20,
     height: 20,
     marginRight: 10,
-    tintColor: '#888',
+    tintColor: 'black',
     resizeMode: 'contain',
   },
   inputText: {
     flex: 1,
     fontSize: 16,
-    color: '#000',
+    color: '#222831',
   },
   checkbox: {
     width: 20,
@@ -311,23 +354,23 @@ const styles = StyleSheet.create({
   checkedBox: {
     width: 12,
     height: 12,
-    backgroundColor: '#333',
+    backgroundColor: '#28a745',
     borderRadius: 2,
   },
   checkboxText: {
     fontSize: 14,
-    color: '#333',
+    color: '#FFD66B',
     marginTop: 12,
     marginBottom: 12,
   },
   orText: {
     textAlign: 'center',
-    color: '#999',
+    color: '#FFD66B',
     marginBottom: 5,
     marginTop: 5,
   },
   socialButton: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f2faff',
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
@@ -336,6 +379,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  signUpButton: {
+    height: height * 0.05,
+    minHeight: 50,
+    backgroundColor: '#FFD66B',
+    borderRadius: 10,
+    margin: 5,
+    alignSelf: 'center',
+    width: width * 0.7,
+  },
+  signUpButtonText: {
+    color: '#222831',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

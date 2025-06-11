@@ -82,7 +82,7 @@ const SubscriptionIntro = () => {
           {features.map((feature, index) => (
             <View key={index} style={styles.featureItem}>
               <View style={styles.featureIcon}>
-                <Ionicons name={feature.icon} size={24} color="#000" />
+                <Ionicons name={feature.icon} size={24} color="#FFD66B" />
               </View>
               <View style={styles.featureText}>
                 <Text style={styles.featureTitle}>{feature.title}</Text>
@@ -127,6 +127,7 @@ const SubscriptionIntro = () => {
           title="Proceed with Premium"
           onPress={handleContinue}
           buttonStyle={styles.continueButton}
+          textStyle={styles.continueButtonText}
         />
         <TouchableOpacity onPress={handleSkip}>
           <Text style={styles.skipText}>Maybe later</Text>
@@ -139,7 +140,7 @@ const SubscriptionIntro = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
   },
   content: {
     flex: 1,
@@ -152,11 +153,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: '#FFD66B',
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#ddd',
     textAlign: 'center',
   },
   featuresContainer: {
@@ -171,7 +173,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#393E46',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
@@ -182,11 +184,12 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#FFF',
     marginBottom: 2,
   },
   featureDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#BBB',
   },
   plansContainer: {
     flexDirection: 'row',
@@ -197,34 +200,35 @@ const styles = StyleSheet.create({
     width: '48%',
     padding: 20,
     borderRadius: 12,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#393E46',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
   },
   selectedPlan: {
-    borderColor: '#000',
-    backgroundColor: '#fff',
+    borderColor: '#FFD66B',
+    backgroundColor: '#222831',
   },
   popularPlan: {
-    backgroundColor: '#f0f7ff',
+    backgroundColor: '#2c313c',
   },
   popularBadge: {
     position: 'absolute',
     top: -12,
     paddingHorizontal: 12,
     paddingVertical: 4,
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     borderRadius: 12,
   },
   popularBadgeText: {
-    color: '#fff',
+    color: '#222831',
     fontSize: 12,
     fontWeight: 'bold',
   },
   planTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#FFF',
     marginBottom: 10,
   },
   priceContainer: {
@@ -234,29 +238,36 @@ const styles = StyleSheet.create({
   planPrice: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#FFD66B',
   },
   planPeriod: {
     fontSize: 16,
-    color: '#666',
+    color: '#aaa',
   },
   savingsText: {
     marginTop: 8,
-    color: '#00a651',
+    color: '#FFD66B',
     fontWeight: 'bold',
   },
   footer: {
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: '#333',
   },
   continueButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     borderRadius: 12,
     marginBottom: 10,
   },
+  continueButtonText: {
+    color: '#222831',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+  },
   skipText: {
     textAlign: 'center',
-    color: '#666',
+    color: '#ccc',
     fontSize: 14,
     paddingVertical: 10,
   },

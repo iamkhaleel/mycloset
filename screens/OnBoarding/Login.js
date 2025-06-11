@@ -6,30 +6,32 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
   Alert,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import ResponsiveButton from '../../components/Button';
-import {useEffect, useState} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useState, useEffect} from 'react';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {getAuth, signInWithEmailAndPassword} from '@react-native-firebase/auth';
-import {
-  getFirestore,
-  collection,
-  doc,
-  setDoc,
-  serverTimestamp,
-} from '@react-native-firebase/firestore';
+
+const {width, height} = Dimensions.get('window');
 
 const Login = () => {
+  const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const navigation = useNavigation();
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: 'YOUR_WEB_CLIENT_ID',
+    });
+  }, []);
 
   const handleGoback = () => {
     navigation.goBack();
@@ -37,172 +39,139 @@ const Login = () => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please enter both email and password');
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     try {
       setLoading(true);
-      const auth = getAuth();
-      const db = getFirestore();
-
-      // Sign in with Firebase Auth
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
+      const userCredential = await auth().signInWithEmailAndPassword(
         email,
         password,
       );
 
-      // Store the user token
-      const token = userCredential.user.uid;
-      await AsyncStorage.setItem('userToken', token);
-
-      // Create or update user document in Firestore
-      const userRef = doc(collection(db, 'users'), userCredential.user.uid);
-      await setDoc(
-        userRef,
-        {
-          email: userCredential.user.email,
-          lastLogin: serverTimestamp(),
-        },
-        {merge: true},
-      );
-
-      setLoading(false);
-      navigation.replace('Main');
-    } catch (error) {
-      setLoading(false);
-      console.error('Login Error:', error);
-
-      let errorMessage = 'Failed to login. Please check your credentials.';
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No account found with this email.';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Invalid password.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email address.';
+      // Check user document exists
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(userCredential.user.uid)
+        .get();
+      if (!userDoc.exists) {
+        throw new Error('User data not found. Please sign up.');
       }
 
-      Alert.alert('Error', errorMessage);
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Main'}],
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert('Error', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const webClientId =
-    '738710187136-m02ql9s8s2pb54kd68tc26dqlo2n3493.apps.googleusercontent.com';
-
-  useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: webClientId,
-    });
-  }, []);
-
-  const googleLogin = async () => {
+  const handleGoogleLogin = async () => {
     try {
       await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      console.log('Google Sign-In Success:', userInfo);
-      navigation.replace('Main');
+      const {idToken} = await GoogleSignin.signIn();
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      const userCredential = await auth().signInWithCredential(
+        googleCredential,
+      );
+
+      // Create user document if it doesn't exist
+      const userDoc = await firestore()
+        .collection('users')
+        .doc(userCredential.user.uid)
+        .get();
+      if (!userDoc.exists) {
+        await firestore().collection('users').doc(userCredential.user.uid).set({
+          email: userCredential.user.email,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+          isPremium: false,
+          premiumExpiryDate: null,
+        });
+      }
+
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'Main'}],
+      });
     } catch (error) {
-      console.error('Google Sign-In Error:', error);
+      console.error('Google Sign-in error:', error);
       Alert.alert('Error', 'Failed to sign in with Google');
     }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={handleGoback} style={{marginLeft: -310}}>
+      <TouchableOpacity
+        onPress={handleGoback}
+        style={{marginLeft: width * -0.88}}>
         <Image
           source={require('../../assets/images/arrow-left.png')}
           resizeMode="contain"
           style={{
             width: 32,
             height: 32,
-            margin: 10,
+            marginStart: '3%',
+            marginTop: '0%',
+            tintColor: '#FFD66B',
           }}
         />
       </TouchableOpacity>
 
-      <View styles={styles.logo}>
+      <View style={styles.logo}>
         <Image
           source={require('../../assets/images/logo.png')}
           resizeMode="contain"
           style={{
             width: 120,
             height: 120,
+            borderRadius: 100,
           }}
         />
       </View>
-      <Text style={styles.title}>Welcome to MyCloset</Text>
-      <Text style={styles.subtitle}>Manage your wardrobe smartly</Text>
+      <Text style={styles.title}>Welcome Back</Text>
+      <Text style={styles.subtitle}>Log in to manage your wardrobe</Text>
 
-      <View style={{marginTop: 20, width: '95%'}}>
-        <Text style={{margin: 5, fontSize: 16, color: '#333'}}>Email</Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 8,
-            paddingHorizontal: 5,
-            paddingVertical: 2,
-            backgroundColor: '#fff',
-          }}>
+      <Text style={styles.title}>Log In</Text>
+
+      {/* Email */}
+      <View style={{marginTop: 5, width: '95%'}}>
+        <Text style={{margin: 2, fontSize: 16, color: '#FFD66B'}}>Email</Text>
+        <View style={styles.inputBox}>
           <Image
             source={require('../../assets/images/email.png')}
-            style={{
-              width: 20,
-              height: 20,
-              marginRight: 10,
-              tintColor: '#888', // Optional: tint the icon
-              resizeMode: 'contain',
-            }}
+            style={styles.inputIcon}
           />
           <TextInput
-            style={{
-              flex: 1,
-              fontSize: 16,
-              color: '#000',
-            }}
+            style={styles.inputText}
             placeholder="Enter your Email Address"
-            placeholderTextColor="#aaa"
+            placeholderTextColor="black"
             value={email}
             onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
       </View>
 
-      <View style={{marginTop: 20, width: '95%'}}>
-        <Text style={{margin: 5, fontSize: 16, color: '#333'}}>Password</Text>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 8,
-            paddingHorizontal: 5,
-            paddingVertical: 2,
-            backgroundColor: '#fff',
-          }}>
+      {/* Password */}
+      <View style={{marginTop: 5, width: '95%'}}>
+        <Text style={{margin: 5, fontSize: 16, color: '#FFD66B'}}>
+          Password
+        </Text>
+        <View style={styles.inputBox}>
           <Image
             source={require('../../assets/images/padlock-fill.png')}
-            style={{
-              width: 20,
-              height: 20,
-              marginRight: 10,
-              tintColor: '#888', // Optional: tint the icon
-              resizeMode: 'contain',
-            }}
+            style={styles.inputIcon}
           />
           <TextInput
-            style={{
-              flex: 1,
-              fontSize: 16,
-              color: '#000',
-            }}
+            style={styles.inputText}
             placeholder="Enter your password"
-            placeholderTextColor="#aaa"
+            placeholderTextColor="black"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
@@ -210,100 +179,62 @@ const Login = () => {
         </View>
       </View>
 
-      <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 15}}>
+      {/* Remember Me */}
+      <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
         <TouchableOpacity
           onPress={() => setRememberMe(!rememberMe)}
-          style={{
-            width: 20,
-            height: 20,
-            borderRadius: 4,
-            borderWidth: 1,
-            borderColor: '#ccc',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginRight: 8,
-          }}>
-          {rememberMe && (
-            <View
-              style={{
-                width: 12,
-                height: 12,
-                backgroundColor: '#333',
-                borderRadius: 2,
-              }}
-            />
-          )}
+          style={styles.checkbox}>
+          {rememberMe && <View style={styles.checkedBox} />}
         </TouchableOpacity>
-        <Text
-          style={{
-            fontSize: 14,
-            color: '#333',
-            marginTop: 12,
-            marginBottom: 12,
-          }}>
-          Remember Me
-        </Text>
+        <Text style={styles.checkboxText}>Remember Me</Text>
         <TouchableOpacity>
-          <Text style={{fontWeight: 'bold', marginStart: 40}}>
-            {' '}
+          <Text style={{fontWeight: 'bold', marginStart: 40, color: '#FFD66B'}}>
             Forgot Password?
           </Text>
         </TouchableOpacity>
       </View>
 
-      <ResponsiveButton title="LogIn" onPress={handleLogin} />
+      {/* Login Button */}
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color="#FFD66B"
+          style={{marginTop: 6}}
+        />
+      ) : (
+        <ResponsiveButton
+          title="Log In"
+          onPress={handleLogin}
+          buttonStyle={styles.loginButton}
+          textStyle={styles.loginButtonText}
+        />
+      )}
 
-      <View style={{marginTop: 30}}>
-        <Text
-          style={{
-            textAlign: 'center',
-            color: '#999',
-            marginBottom: 12,
-            marginTop: 12,
-          }}>
-          or continue with
-        </Text>
+      {/* Divider */}
+      <View style={{marginTop: 6}}>
+        <Text style={styles.orText}>or continue with</Text>
 
         <View style={{flexDirection: 'row', justifyContent: 'center', gap: 15}}>
+          {/* Google */}
           <TouchableOpacity
-            style={{
-              backgroundColor: '#fff',
-              borderWidth: 1,
-              borderColor: '#ccc',
-              borderRadius: 8,
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 8,
-            }}
-            onPress={googleLogin}>
+            style={styles.socialButton}
+            onPress={handleGoogleLogin}>
             <Image
               source={require('../../assets/images/google-logo.png')}
               style={{width: 18, height: 18}}
             />
-            <Text style={{color: '#333'}}>Google</Text>
+            <Text style={{color: '#222831'}}>Google</Text>
           </TouchableOpacity>
 
-          {/*  <TouchableOpacity
-            style={{
-              backgroundColor: "#fff",
-              borderWidth: 1,
-              borderColor: "#ccc",
-              borderRadius: 8,
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
+          {/* Apple */}
+          <TouchableOpacity style={styles.socialButton}>
             <Image
-              source={require("../../assets/images/apple-logo.png")}
-              style={{ width: 18, height: 18 }}
+              source={require('../../assets/images/apple-logo.png')}
+              style={{width: 16, height: 16}}
+              resizeMode="contain"
             />
-            <Text style={{ color: "#333" }}>Apple</Text>
-          </TouchableOpacity> */}
+            <Text style={{color: '#222831'}}>Apple</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -316,48 +247,102 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
   },
   logo: {
     alignContent: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
+    marginBottom: 10,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 6,
+    color: '#FFD66B',
+    marginTop: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
+    color: '#FFD66B',
+    marginBottom: 6,
     textAlign: 'center',
   },
-  inputContainer: {
-    marginVertical: 5,
+  inputBox: {
+    flexDirection: 'row',
     alignItems: 'center',
-    width: '80%',
-    height: '20%',
-  },
-  inputLogo: {
-    width: 10,
-    height: 10,
-    margin: 0,
-  },
-  inputLabel: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: '#333', // Adjust the color as needed
-  },
-  inputField: {
-    width: '100%',
-    padding: 10,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
+    borderRadius: 8,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    backgroundColor: '#f2faff',
+  },
+  inputIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    tintColor: 'black',
+    resizeMode: 'contain',
+  },
+  inputText: {
+    flex: 1,
     fontSize: 16,
-    paddingHorizontal: 10,
+    color: '#222831',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  checkedBox: {
+    width: 12,
+    height: 12,
+    backgroundColor: '#28a745',
+    borderRadius: 2,
+  },
+  checkboxText: {
+    fontSize: 14,
+    color: '#FFD66B',
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  orText: {
+    textAlign: 'center',
+    color: '#FFD66B',
+    marginBottom: 5,
+    marginTop: 5,
+  },
+  socialButton: {
+    backgroundColor: '#f2faff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  loginButton: {
+    height: height * 0.05,
+    minHeight: 50,
+    backgroundColor: '#FFD66B',
+    borderRadius: 10,
+    margin: 5,
+    alignSelf: 'center',
+    width: width * 0.8,
+  },
+  loginButtonText: {
+    color: '#222831',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

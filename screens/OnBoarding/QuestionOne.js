@@ -85,6 +85,7 @@ const QuestionOne = () => {
               onPress={handleNext}
               title={'Next'}
               buttonStyle={styles.nextButton}
+              textStyle={styles.nextButtonText}
             />
           )}
         </View>
@@ -96,7 +97,7 @@ const QuestionOne = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -114,6 +115,7 @@ const styles = StyleSheet.create({
     height: width * 0.08,
     maxWidth: 32,
     maxHeight: 32,
+    tintColor: '#FFD66B',
   },
   title: {
     fontSize: width * 0.06,
@@ -122,10 +124,12 @@ const styles = StyleSheet.create({
     marginHorizontal: width * 0.05,
     marginTop: height * 0.02,
     marginBottom: height * 0.02,
+    color: '#FFD66B',
+    textAlign: 'center',
   },
   optionsContainer: {
-    marginVertical: height * 0.02,
-    paddingHorizontal: width * 0.03,
+    marginVertical: height * 0.06,
+    paddingHorizontal: width * 0.06,
   },
   option: {
     flexDirection: 'row',
@@ -133,11 +137,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: height * 0.018,
     paddingHorizontal: width * 0.04,
-    marginBottom: height * 0.015,
-    borderRadius: 10,
+    marginBottom: height * 0.01,
+    borderRadius: 40,
     borderWidth: 1.5,
     borderColor: '#ccc',
-    backgroundColor: '#fff',
+    backgroundColor: '#f2faff',
   },
   selectedOption: {
     borderColor: '#1e1e1e',
@@ -153,7 +157,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: width * 0.04,
-    color: '#1e1e1e',
+    color: '#222831',
     fontWeight: '400',
   },
   selectedOptionText: {
@@ -166,11 +170,17 @@ const styles = StyleSheet.create({
   nextButton: {
     height: height * 0.07,
     minHeight: 50,
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     borderRadius: 10,
     margin: 5,
     alignSelf: 'center',
     width: width * 0.9,
+  },
+  nextButtonText: {
+    color: '#222831',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

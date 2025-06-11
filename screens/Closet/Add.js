@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import ResponsiveButton from '../../components/Button';
@@ -110,6 +110,7 @@ const MATERIALS = [
 
 const AddItem = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
   const [selectedImage, setSelectedImage] = useState(null);
   const [base64Image, setBase64Image] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -153,6 +154,35 @@ const AddItem = () => {
         }
       }
     }
+  };
+
+  // Defensive wrappers for image picker
+  const handleLaunchCamera = () => {
+    if (!isFocused) return;
+    launchCamera(
+      {
+        mediaType: 'photo',
+        cameraType: 'back',
+        saveToPhotos: true,
+        quality: 0.7,
+        maxWidth: 800,
+        maxHeight: 800,
+      },
+      handleImageResponse,
+    );
+  };
+
+  const handleLaunchImageLibrary = () => {
+    if (!isFocused) return;
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        quality: 0.7,
+        maxWidth: 800,
+        maxHeight: 800,
+      },
+      handleImageResponse,
+    );
   };
 
   const uploadToFirestore = async () => {
@@ -284,19 +314,7 @@ const AddItem = () => {
         {!selectedImage ? (
           <View>
             <TouchableOpacity
-              onPress={() =>
-                launchCamera(
-                  {
-                    mediaType: 'photo',
-                    cameraType: 'back',
-                    saveToPhotos: true,
-                    quality: 0.7,
-                    maxWidth: 800,
-                    maxHeight: 800,
-                  },
-                  handleImageResponse,
-                )
-              }
+              onPress={handleLaunchCamera}
               style={styles.actionButton}>
               <View style={styles.actionContent}>
                 <Ionicons name="camera" size={30} color="#000" />
@@ -305,17 +323,7 @@ const AddItem = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() =>
-                launchImageLibrary(
-                  {
-                    mediaType: 'photo',
-                    quality: 0.7,
-                    maxWidth: 800,
-                    maxHeight: 800,
-                  },
-                  handleImageResponse,
-                )
-              }
+              onPress={handleLaunchImageLibrary}
               style={styles.actionButton}>
               <View style={styles.actionContent}>
                 <Ionicons name="images" size={30} color="#000" />
