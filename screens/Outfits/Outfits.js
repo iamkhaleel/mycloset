@@ -39,6 +39,7 @@ const Outfits = () => {
       setOutfits(docs);
     } catch (error) {
       console.error('Error fetching outfits:', error);
+      Alert.alert('Error', 'Failed to load outfits');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -332,6 +333,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 2,
   },
+
   limitInfo: {
     flex: 1,
   },

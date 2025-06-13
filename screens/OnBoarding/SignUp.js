@@ -16,7 +16,10 @@ import ResponsiveButton from '../../components/Button';
 import {useState, useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import Ionicons from '@react-native-vector-icons/ionicons';
 
 const {width, height} = Dimensions.get('window');
@@ -34,7 +37,8 @@ const SignUp = () => {
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: 'YOUR_WEB_CLIENT_ID',
+      webClientId:
+        '738710187136-m02ql9s8s2pb54kd68tc26dqlo2n3493.apps.googleusercontent.com',
     });
   }, []);
 
@@ -109,7 +113,17 @@ const SignUp = () => {
       });
     } catch (error) {
       console.error('Google Sign-in error:', error);
-      Alert.alert('Error', 'Failed to sign in with Google');
+
+      // Improved error handling
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        Alert.alert('Error', 'Sign in was cancelled');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        Alert.alert('Error', 'Sign in is already in progress');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        Alert.alert('Error', 'Play services not available or outdated');
+      } else {
+        Alert.alert('Error', 'Failed to sign in with Google');
+      }
     }
   };
 

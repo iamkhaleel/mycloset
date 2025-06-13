@@ -29,7 +29,8 @@ const Login = () => {
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: 'YOUR_WEB_CLIENT_ID',
+      webClientId:
+        '738710187136-m02ql9s8s2pb54kd68tc26dqlo2n3493.apps.googleusercontent.com',
     });
   }, []);
 

@@ -115,7 +115,8 @@ const styles = StyleSheet.create({
   },
   upgradeButton: {
     backgroundColor: '#000',
-    marginBottom: 10,
+    marginBottom: 30,
+    width: '70%',
   },
   cancelText: {
     textAlign: 'center',

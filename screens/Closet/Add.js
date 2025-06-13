@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,8 @@ import RNFS from 'react-native-fs';
 import ModalDropdown from 'react-native-modal-dropdown';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
+import {removeBackground} from '../../utils/ImageProcessing';
+import PhotoGuide from '../../components/PhotoGuide';
 
 const CATEGORIES = [
   'Tops',
@@ -114,6 +116,9 @@ const AddItem = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [base64Image, setBase64Image] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [processingImage, setProcessingImage] = useState(false);
+  const [removeBgEnabled, setRemoveBgEnabled] = useState(false);
+  const [showPhotoGuide, setShowPhotoGuide] = useState(false);
 
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
@@ -144,13 +149,43 @@ const AddItem = () => {
       const asset = response.assets[0];
       console.log('Selected Image: ', asset);
       if (asset.uri) {
-        setSelectedImage(asset.uri);
-        try {
-          const base64 = await RNFS.readFile(asset.uri, 'base64');
-          setBase64Image(base64);
-        } catch (error) {
-          console.error('Base64 conversion error:', error);
-          Alert.alert('Error', 'Failed to process image');
+        if (removeBgEnabled) {
+          setProcessingImage(true);
+          try {
+            const result = await removeBackground(asset.uri);
+            if (result.success) {
+              setSelectedImage(result.uri);
+              setBase64Image(result.base64);
+            } else {
+              Alert.alert(
+                'Error',
+                'Failed to remove background. Using original image.',
+              );
+              setSelectedImage(asset.uri);
+              const base64 = await RNFS.readFile(asset.uri, 'base64');
+              setBase64Image(base64);
+            }
+          } catch (error) {
+            console.error('Background removal error:', error);
+            Alert.alert(
+              'Error',
+              'Failed to remove background. Using original image.',
+            );
+            setSelectedImage(asset.uri);
+            const base64 = await RNFS.readFile(asset.uri, 'base64');
+            setBase64Image(base64);
+          } finally {
+            setProcessingImage(false);
+          }
+        } else {
+          setSelectedImage(asset.uri);
+          try {
+            const base64 = await RNFS.readFile(asset.uri, 'base64');
+            setBase64Image(base64);
+          } catch (error) {
+            console.error('Base64 conversion error:', error);
+            Alert.alert('Error', 'Failed to process image');
+          }
         }
       }
     }
@@ -308,6 +343,14 @@ const AddItem = () => {
               style={styles.previewImage}
               resizeMode="cover"
             />
+            {processingImage && (
+              <View style={styles.processingOverlay}>
+                <ActivityIndicator size="large" color="#fff" />
+                <Text style={styles.processingText}>
+                  Removing background...
+                </Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -336,6 +379,28 @@ const AddItem = () => {
                 <Text style={{color: 'white'}}>OR</Text>
               </View>
             </View>
+
+            <TouchableOpacity
+              style={[
+                styles.actionButton,
+                removeBgEnabled && styles.activeButton,
+              ]}
+              onPress={() => setRemoveBgEnabled(!removeBgEnabled)}>
+              <View style={styles.actionContent}>
+                <Ionicons
+                  name={removeBgEnabled ? 'checkmark-circle' : 'cut-outline'}
+                  size={30}
+                  color={removeBgEnabled ? '#fff' : '#000'}
+                />
+                <Text
+                  style={[
+                    {marginStart: 10},
+                    removeBgEnabled && {color: '#fff'},
+                  ]}>
+                  Remove Background
+                </Text>
+              </View>
+            </TouchableOpacity>
 
             <TouchableOpacity style={styles.proButton}>
               <View style={styles.actionContent}>
@@ -458,6 +523,11 @@ const AddItem = () => {
             )}
           </View>
         )}
+
+        <PhotoGuide
+          visible={showPhotoGuide}
+          onClose={() => setShowPhotoGuide(false)}
+        />
       </ScrollView>
     </SafeAreaView>
   );
@@ -602,6 +672,41 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     marginRight: 10,
+  },
+  processingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  processingText: {
+    color: '#fff',
+    marginTop: 10,
+    fontSize: 16,
+  },
+  activeButton: {
+    backgroundColor: '#000',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  photoGuideButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  photoGuideButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

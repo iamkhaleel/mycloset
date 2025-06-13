@@ -9,6 +9,7 @@ import {
   Linking,
   Share,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import firestore from '@react-native-firebase/firestore';
@@ -24,6 +25,7 @@ const Settings = () => {
     items: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [user, setUser] = useState(null);
   const [isPremium, setIsPremium] = useState(false);
 
@@ -82,6 +84,7 @@ const Settings = () => {
       }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -159,8 +162,18 @@ const Settings = () => {
     }
   };
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchCounts();
+    checkUserPremiumStatus();
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       <Text style={styles.title}>Settings</Text>
 
       {/* Account Section */}
