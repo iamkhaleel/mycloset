@@ -16,6 +16,7 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation, StackActions} from '@react-navigation/native';
 import {checkPremiumStatus} from '../../utils/PremiumFeatures';
+import {removeUser} from '../../utils/AuthStorage';
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -105,11 +106,7 @@ const Settings = () => {
         onPress: async () => {
           try {
             await auth().signOut();
-            // Navigate to Onboarding stack which contains Welcome screen
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'Onboarding'}],
-            });
+            await removeUser();
           } catch (error) {
             console.error('Error logging out:', error);
             Alert.alert('Error', 'Failed to logout. Please try again.');

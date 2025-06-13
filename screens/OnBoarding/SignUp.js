@@ -21,6 +21,7 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import Ionicons from '@react-native-vector-icons/ionicons';
+import {saveUser} from '../../utils/AuthStorage';
 
 const {width, height} = Dimensions.get('window');
 
@@ -72,6 +73,8 @@ const SignUp = () => {
         premiumExpiryDate: null,
       });
 
+      await saveUser(userCredential.user);
+
       navigation.reset({
         index: 0,
         routes: [{name: 'Main'}],
@@ -106,6 +109,8 @@ const SignUp = () => {
           premiumExpiryDate: null,
         });
       }
+
+      await saveUser(userCredential.user);
 
       navigation.reset({
         index: 0,

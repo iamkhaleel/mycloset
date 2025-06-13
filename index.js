@@ -6,6 +6,8 @@ import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import firebase from '@react-native-firebase/app';
+import {Buffer} from 'buffer';
+global.Buffer = Buffer;
 
 // Firebase configuration (replace with your values from Firebase Console)
 const firebaseConfig = {

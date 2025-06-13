@@ -17,6 +17,7 @@ import {useState, useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {saveUser} from '../../utils/AuthStorage';
 
 const {width, height} = Dimensions.get('window');
 
@@ -60,6 +61,8 @@ const Login = () => {
         throw new Error('User data not found. Please sign up.');
       }
 
+      await saveUser(userCredential.user);
+
       navigation.reset({
         index: 0,
         routes: [{name: 'Main'}],
@@ -94,6 +97,8 @@ const Login = () => {
           premiumExpiryDate: null,
         });
       }
+
+      await saveUser(userCredential.user);
 
       navigation.reset({
         index: 0,
