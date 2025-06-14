@@ -37,11 +37,21 @@ const SignUp = () => {
   const {width, height} = Dimensions.get('window');
 
   useEffect(() => {
-    GoogleSignin.configure({
-      webClientId:
-        '738710187136-m02ql9s8s2pb54kd68tc26dqlo2n3493.apps.googleusercontent.com',
-    });
+    configureGoogleSign();
   }, []);
+
+  const configureGoogleSign = async () => {
+    try {
+      await GoogleSignin.configure({
+        webClientId:
+          '738710187136-m02ql9s8s2pb54kd68tc26dqlo2n3493.apps.googleusercontent.com',
+        offlineAccess: true,
+        forceCodeForRefreshToken: true,
+      });
+    } catch (error) {
+      console.error('Google Sign-in configuration error:', error);
+    }
+  };
 
   const handleGoback = () => {
     navigation.goBack();
@@ -89,9 +99,26 @@ const SignUp = () => {
 
   const handleGoogleSignUp = async () => {
     try {
-      await GoogleSignin.hasPlayServices();
-      const {idToken} = await GoogleSignin.signIn();
-      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      setLoading(true);
+
+      // Check if your device supports Google Play
+      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+
+      // Sign in and get tokens
+      const userInfo = await GoogleSignin.signIn();
+      const tokens = await GoogleSignin.getTokens();
+
+      if (!tokens || !tokens.accessToken) {
+        throw new Error('Failed to get access token');
+      }
+
+      // Create a Google credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(
+        tokens.idToken,
+        tokens.accessToken,
+      );
+
+      // Sign-in the user with the credential
       const userCredential = await auth().signInWithCredential(
         googleCredential,
       );
@@ -119,16 +146,27 @@ const SignUp = () => {
     } catch (error) {
       console.error('Google Sign-in error:', error);
 
-      // Improved error handling
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        Alert.alert('Error', 'Sign in was cancelled');
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        Alert.alert('Error', 'Sign in is already in progress');
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        Alert.alert('Error', 'Play services not available or outdated');
+      // Handle specific Google Sign-in errors
+      if (error.code) {
+        switch (error.code) {
+          case statusCodes.SIGN_IN_CANCELLED:
+            Alert.alert('Error', 'Sign in was cancelled');
+            break;
+          case statusCodes.IN_PROGRESS:
+            Alert.alert('Error', 'Sign in is already in progress');
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            Alert.alert('Error', 'Play services not available or outdated');
+            break;
+          default:
+            Alert.alert('Error', 'Failed to sign in with Google');
+        }
       } else {
-        Alert.alert('Error', 'Failed to sign in with Google');
+        // Handle other types of errors
+        Alert.alert('Error', error.message || 'Failed to sign in with Google');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -299,7 +337,7 @@ const SignUp = () => {
             <Text style={{color: '#222831'}}>Google</Text>
           </TouchableOpacity>
 
-          {/* Apple */}
+          {/* Apple 
           <TouchableOpacity style={styles.socialButton}>
             <Image
               source={require('../../assets/images/apple-logo.png')}
@@ -308,6 +346,8 @@ const SignUp = () => {
             />
             <Text style={{color: '#222831'}}>Apple</Text>
           </TouchableOpacity>
+
+          */}
         </View>
       </View>
     </View>
