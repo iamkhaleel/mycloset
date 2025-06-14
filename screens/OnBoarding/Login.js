@@ -161,6 +161,27 @@ const Login = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Please enter your email address');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await auth().sendPasswordResetEmail(email);
+      Alert.alert(
+        'Success',
+        'Password reset email sent. Please check your inbox.',
+      );
+    } catch (error) {
+      console.error('Password reset error:', error);
+      Alert.alert('Error', error.message || 'Failed to send reset email');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -236,7 +257,7 @@ const Login = () => {
         </View>
       </View>
 
-      {/* Remember Me */}
+      {/* Remember Me and Forgot Password */}
       <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
         <TouchableOpacity
           onPress={() => setRememberMe(!rememberMe)}
@@ -244,7 +265,7 @@ const Login = () => {
           {rememberMe && <View style={styles.checkedBox} />}
         </TouchableOpacity>
         <Text style={styles.checkboxText}>Remember Me</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleForgotPassword}>
           <Text style={{fontWeight: 'bold', marginStart: 40, color: '#FFD66B'}}>
             Forgot Password?
           </Text>
@@ -282,17 +303,6 @@ const Login = () => {
             />
             <Text style={{color: '#222831'}}>Google</Text>
           </TouchableOpacity>
-
-          {/* Apple 
-          <TouchableOpacity style={styles.socialButton}>
-            <Image
-              source={require('../../assets/images/apple-logo.png')}
-              style={{width: 16, height: 16}}
-              resizeMode="contain"
-            />
-            <Text style={{color: '#222831'}}>Apple</Text>
-          </TouchableOpacity>
-          */}
         </View>
       </View>
     </View>
@@ -361,7 +371,7 @@ const styles = StyleSheet.create({
   checkedBox: {
     width: 12,
     height: 12,
-    backgroundColor: '#28a745',
+    backgroundColor: '#FFD66B',
     borderRadius: 2,
   },
   checkboxText: {
