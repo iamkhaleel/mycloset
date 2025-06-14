@@ -21,6 +21,8 @@ import {
   FREE_TIER_LIMITS,
 } from '../../utils/PremiumFeatures';
 import PremiumModal from '../../components/PremiumModal';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const Lookbooks = () => {
   const navigation = useNavigation();
@@ -93,41 +95,50 @@ const Lookbooks = () => {
     }
   };
 
-  const handleDeleteSelected = () => {
-    Alert.alert(
-      'Delete Lookbooks',
-      `Are you sure you want to delete ${selectedLookbooks.length} lookbook${
-        selectedLookbooks.length > 1 ? 's' : ''
-      }?`,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await Promise.all(
-                selectedLookbooks.map(lookbook =>
-                  deleteUserDoc('lookbooks', lookbook.id),
-                ),
-              );
+  const handleDeleteSelected = async () => {
+    try {
+      setLoading(true);
+      const failedDeletions = [];
 
-              // Refresh the list
-              fetchLookbooks();
-              setIsSelectionMode(false);
-              setSelectedLookbooks([]);
-              Alert.alert('Success', 'Lookbooks deleted successfully');
-            } catch (error) {
-              console.error('Error deleting lookbooks:', error);
-              Alert.alert('Error', 'Failed to delete lookbooks');
-            }
-          },
-        },
-      ],
-    );
+      // Delete each selected lookbook
+      for (const lookbook of selectedLookbooks) {
+        try {
+          const user = auth().currentUser;
+          if (!user) throw new Error('No authenticated user');
+
+          // Delete directly from Firestore using the same path structure as storage
+          await firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('lookbooks')
+            .doc(lookbook.id)
+            .delete();
+        } catch (error) {
+          console.error('Error deleting lookbook:', error);
+          failedDeletions.push(lookbook);
+        }
+      }
+
+      // Refresh the lookbooks list
+      await fetchLookbooks();
+
+      // Show appropriate message
+      if (failedDeletions.length > 0) {
+        Alert.alert(
+          'Partial Success',
+          `Some lookbooks could not be deleted. Please try again.`,
+        );
+      } else {
+        Alert.alert('Success', 'Selected lookbooks have been deleted.');
+      }
+    } catch (error) {
+      console.error('Error in handleDeleteSelected:', error);
+      Alert.alert('Error', 'Failed to delete lookbooks. Please try again.');
+    } finally {
+      setLoading(false);
+      setSelectedLookbooks([]);
+      setShowDeleteConfirmation(false);
+    }
   };
 
   if (loading) {

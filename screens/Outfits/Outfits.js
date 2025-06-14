@@ -21,6 +21,8 @@ import {
   FREE_TIER_LIMITS,
 } from '../../utils/PremiumFeatures';
 import PremiumModal from '../../components/PremiumModal';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const Outfits = () => {
   const navigation = useNavigation();
@@ -92,41 +94,50 @@ const Outfits = () => {
     }
   };
 
-  const handleDeleteSelected = () => {
-    Alert.alert(
-      'Delete Outfits',
-      `Are you sure you want to delete ${selectedOutfits.length} outfit${
-        selectedOutfits.length > 1 ? 's' : ''
-      }?`,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await Promise.all(
-                selectedOutfits.map(outfit =>
-                  deleteUserDoc('outfits', outfit.id),
-                ),
-              );
+  const handleDeleteSelected = async () => {
+    try {
+      setLoading(true);
+      const failedDeletions = [];
 
-              // Refresh the list
-              fetchOutfits();
-              setIsSelectionMode(false);
-              setSelectedOutfits([]);
-              Alert.alert('Success', 'Outfits deleted successfully');
-            } catch (error) {
-              console.error('Error deleting outfits:', error);
-              Alert.alert('Error', 'Failed to delete outfits');
-            }
-          },
-        },
-      ],
-    );
+      // Delete each selected outfit
+      for (const outfit of selectedOutfits) {
+        try {
+          const user = auth().currentUser;
+          if (!user) throw new Error('No authenticated user');
+
+          // Delete directly from Firestore using the same path structure as storage
+          await firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('outfits')
+            .doc(outfit.id)
+            .delete();
+        } catch (error) {
+          console.error('Error deleting outfit:', error);
+          failedDeletions.push(outfit);
+        }
+      }
+
+      // Refresh the outfits list
+      await fetchOutfits();
+
+      // Show appropriate message
+      if (failedDeletions.length > 0) {
+        Alert.alert(
+          'Partial Success',
+          `Some outfits could not be deleted. Please try again.`,
+        );
+      } else {
+        Alert.alert('Success', 'Selected outfits have been deleted.');
+      }
+    } catch (error) {
+      console.error('Error in handleDeleteSelected:', error);
+      Alert.alert('Error', 'Failed to delete outfits. Please try again.');
+    } finally {
+      setLoading(false);
+      setSelectedOutfits([]);
+      setShowDeleteConfirmation(false);
+    }
   };
 
   if (loading) {

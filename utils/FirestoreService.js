@@ -113,21 +113,42 @@ export const addUserDoc = async (collectionName, data) => {
 
 // Delete a document from a user's collection
 export const deleteUserDoc = async (collectionName, docId) => {
-  const collection = getUserCollection(collectionName);
+  try {
+    const collection = getUserCollection(collectionName);
+    const docRef = collection.doc(docId);
 
-  // Delete the document
-  await collection.doc(docId).delete();
+    // First check if the document exists
+    const docSnapshot = await docRef.get();
+    if (!docSnapshot.exists) {
+      throw new Error('Document does not exist');
+    }
 
-  // Update the metadata count
-  const metadataRef = collection.doc('metadata');
-  await firestore().runTransaction(async transaction => {
-    const metadata = await transaction.get(metadataRef);
-    const newCount = Math.max((metadata.data()?.totalCount || 0) - 1, 0);
-    transaction.update(metadataRef, {
-      totalCount: newCount,
-      lastUpdated: firestore.FieldValue.serverTimestamp(),
+    // Delete the document
+    await docRef.delete();
+
+    // Update the metadata count
+    const metadataRef = collection.doc('metadata');
+    await firestore().runTransaction(async transaction => {
+      const metadata = await transaction.get(metadataRef);
+      if (!metadata.exists) {
+        // If metadata doesn't exist, create it with count 0
+        transaction.set(metadataRef, {
+          totalCount: 0,
+          lastUpdated: firestore.FieldValue.serverTimestamp(),
+        });
+      } else {
+        // If metadata exists, update the count
+        const newCount = Math.max((metadata.data()?.totalCount || 0) - 1, 0);
+        transaction.update(metadataRef, {
+          totalCount: newCount,
+          lastUpdated: firestore.FieldValue.serverTimestamp(),
+        });
+      }
     });
-  });
+  } catch (error) {
+    console.error(`Error deleting document from ${collectionName}:`, error);
+    throw error;
+  }
 };
 
 // Update a document in a user's collection
