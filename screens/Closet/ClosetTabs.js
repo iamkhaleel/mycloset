@@ -7,7 +7,7 @@ const ClosetTabs = () => {
   const [activeTab, setActiveTab] = useState('mycloset');
 
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.container}>
       <View style={styles.tabBar}>
         <TouchableOpacity
           onPress={() => setActiveTab('mycloset')}
@@ -15,7 +15,7 @@ const ClosetTabs = () => {
           <Text
             style={[
               styles.tabText,
-              activeTab === 'mycloset' ? {color: '#fff'} : {color: '#000'},
+              activeTab === 'mycloset' ? {color: '#222831'} : {color: '#fff'},
             ]}>
             My Closet
           </Text>
@@ -26,7 +26,7 @@ const ClosetTabs = () => {
           <Text
             style={[
               styles.tabText,
-              activeTab === 'suggested' ? {color: '#fff'} : {color: '#000'},
+              activeTab === 'suggested' ? {color: '#222831'} : {color: '#fff'},
             ]}>
             Suggested
           </Text>
@@ -38,20 +38,25 @@ const ClosetTabs = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#222831',
+  },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: '10%',
+    backgroundColor: '#222831',
   },
   tab: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginHorizontal: 5,
     borderRadius: 20,
-    backgroundColor: '#eee',
+    backgroundColor: '#2D333B',
   },
   activeTab: {
-    backgroundColor: '#222',
+    backgroundColor: '#FFD66B',
   },
   tabText: {
     fontWeight: 'bold',

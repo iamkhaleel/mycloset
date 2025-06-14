@@ -150,7 +150,7 @@ const Lookbooks = () => {
                   setIsSelectionMode(false);
                   setSelectedLookbooks([]);
                 }}>
-                <Ionicons name="close" size={24} color="#000" />
+                <Ionicons name="close" size={24} color="#FFD66B" />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>
                 {selectedLookbooks.length} selected
@@ -158,17 +158,26 @@ const Lookbooks = () => {
               <TouchableOpacity
                 style={styles.headerButton}
                 onPress={handleDeleteSelected}>
-                <Ionicons name="trash-outline" size={24} color="#000" />
+                <Ionicons name="trash-outline" size={24} color="#FFD66B" />
               </TouchableOpacity>
             </>
           ) : (
             <>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back" size={24} color="#FFD66B" />
+              </TouchableOpacity>
               <Text style={styles.headerTitle}>Lookbooks</Text>
               <View style={styles.headerRight}>
                 <TouchableOpacity
                   style={styles.headerButton}
                   onPress={() => setMenuVisible(true)}>
-                  <Ionicons name="ellipsis-horizontal" size={24} color="#000" />
+                  <Ionicons
+                    name="ellipsis-horizontal"
+                    size={24}
+                    color="#FFD66B"
+                  />
                 </TouchableOpacity>
               </View>
             </>
@@ -261,7 +270,7 @@ const Lookbooks = () => {
                   setMenuVisible(false);
                   setIsSelectionMode(true);
                 }}>
-                <Ionicons name="checkbox-outline" size={24} color="#000" />
+                <Ionicons name="checkbox-outline" size={24} color="#FFD66B" />
                 <Text style={styles.menuText}>Select Multiple</Text>
               </TouchableOpacity>
             </View>
@@ -285,10 +294,12 @@ const Lookbooks = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#222831',
   },
-  content: {
+  loadingContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -296,21 +307,87 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
+  },
+  backButton: {
+    padding: 8,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#000',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#eee',
   },
-  headerRight: {
+  placeholder: {
+    width: 40,
+  },
+  content: {
+    flex: 1,
+  },
+  description: {
+    fontSize: 16,
+    color: '#eee',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#3B4048',
+  },
+  themeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#3B4048',
   },
-  headerButton: {
-    padding: 8,
+  themeLabel: {
+    fontSize: 16,
+    color: '#eee',
+    marginRight: 8,
+  },
+  themeTag: {
+    backgroundColor: '#2D333B',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  themeText: {
+    fontSize: 14,
+    color: '#eee',
+  },
+  outfitsContainer: {
+    padding: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#eee',
+  },
+  outfitCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#eee',
+    borderRadius: 12,
+    marginBottom: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#3B4048',
+  },
+  outfitInfo: {
+    flex: 1,
+  },
+  outfitName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#222831',
+  },
+  itemCount: {
+    fontSize: 14,
+    color: '#666',
+  },
+  chevron: {
+    marginLeft: 8,
   },
   scrollContent: {
     flex: 1,
@@ -342,13 +419,13 @@ const styles = StyleSheet.create({
   limitTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: '#222831',
     marginBottom: 4,
   },
   limitText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#222831',
     marginBottom: 8,
   },
   progressBar: {
@@ -362,16 +439,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   upgradeButton: {
-    backgroundColor: '#000',
-    paddingHorizontal: 16,
+    backgroundColor: '#FFD66B',
+    paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,
     marginLeft: 16,
   },
   upgradeButtonText: {
-    color: '#fff',
+    color: '#222831',
     fontWeight: '600',
-    fontSize: 14,
   },
   emptyContainer: {
     flex: 1,
@@ -381,26 +457,25 @@ const styles = StyleSheet.create({
     paddingTop: '40%',
   },
   emptyText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#000',
-    marginTop: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 8,
+    color: '#eee',
   },
   emptySubText: {
     fontSize: 16,
-    color: '#666',
+    color: '#eee',
     textAlign: 'center',
     marginBottom: 24,
   },
   createButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 24,
   },
   createButtonText: {
-    color: '#fff',
+    color: '#222831',
     fontWeight: '600',
     fontSize: 16,
   },
@@ -408,26 +483,26 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 32,
     right: 32,
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 24,
     elevation: 5,
   },
   floatingText: {
-    color: '#fff',
+    color: '#222831',
     fontWeight: '600',
     fontSize: 16,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(34, 40, 49, 0.9)',
   },
   menuContent: {
     position: 'absolute',
     top: 60,
     right: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#2D333B',
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: {
@@ -447,12 +522,14 @@ const styles = StyleSheet.create({
   menuText: {
     marginLeft: 12,
     fontSize: 16,
-    color: '#000',
+    color: '#eee',
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  headerRight: {
+    flexDirection: 'row',
     alignItems: 'center',
+  },
+  headerButton: {
+    padding: 8,
   },
 });
 

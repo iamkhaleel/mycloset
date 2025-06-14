@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   descriptionContainer: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#FFD66B',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
@@ -80,11 +80,11 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: '#666',
+    color: '#222831',
   },
   count: {
     fontSize: 14,
-    color: '#888',
+    color: '#222831',
   },
   iconContainer: {
     marginLeft: 12,

@@ -242,7 +242,7 @@ const MyCloset = () => {
       {selectedItems.some(selected => selected.id === item.id) && (
         <View style={styles.selectionOverlay}>
           <View style={styles.checkmarkContainer}>
-            <Ionicons name="checkmark-circle" size={24} color="#000" />
+            <Ionicons name="checkmark-circle" size={24} color="#FFD66B" />
           </View>
         </View>
       )}
@@ -287,7 +287,7 @@ const MyCloset = () => {
                   setSelectedItems([]);
                 }}>
                 <View style={styles.iconButton}>
-                  <Ionicons name="close" size={22} color="#000" />
+                  <Ionicons name="close" size={22} color="#FFD66B" />
                 </View>
               </TouchableOpacity>
               <View style={styles.selectionInfo}>
@@ -361,12 +361,12 @@ const MyCloset = () => {
               <Ionicons
                 name={FILTER_ICONS[filter]}
                 size={16}
-                color={selectedFilter === filter ? '#fff' : '#000'}
+                color={selectedFilter === filter ? '#222831' : '#eee'}
                 style={{marginRight: 6}}
               />
               <Text
                 style={{
-                  color: selectedFilter === filter ? '#fff' : '#000',
+                  color: selectedFilter === filter ? '#222831' : '#eee',
                   fontWeight: 'bold',
                 }}>
                 {filter}
@@ -500,37 +500,37 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
     paddingTop: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#222831',
   },
   filterBar: {
     paddingVertical: 10,
     paddingHorizontal: 10,
-    backgroundColor: 'transparent', // Removed black background
+    backgroundColor: 'transparent',
   },
   filterBtn: {
-    marginRight: 8, // Reduced margin
+    marginRight: 8,
     paddingVertical: 8,
-    paddingHorizontal: 12, // Reduced padding
-    backgroundColor: '#eee',
+    paddingHorizontal: 12,
+    backgroundColor: '#2D333B',
     borderRadius: 12,
     height: 35,
     justifyContent: 'center',
   },
   activeFilter: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
   },
   floatingBtn: {
     position: 'absolute',
-    bottom: 30, // Adjusted position
-    right: 20, // Adjusted position
-    backgroundColor: '#000',
+    bottom: 30,
+    right: 20,
+    backgroundColor: '#FFD66B',
     borderRadius: 16,
     paddingVertical: 10,
     paddingHorizontal: 16,
     elevation: 5,
   },
   floatingText: {
-    color: '#fff',
+    color: '#222831',
     fontWeight: 'bold',
   },
   topButtons: {
@@ -541,28 +541,28 @@ const styles = StyleSheet.create({
   topBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#eee',
+    backgroundColor: '#FFD66B',
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 12,
-    marginRight: 8, // Reduced margin
+    marginRight: 8,
   },
   itemsGrid: {
-    padding: 5, // Reduced padding
+    padding: 5,
   },
   itemContainer: {
     flex: 1,
-    margin: 4, // Reduced margin
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    margin: 4,
+    backgroundColor: '#2D333B',
+    borderRadius: 22,
     overflow: 'hidden',
     elevation: 2,
-    maxWidth: '48%', // Adjusted width
+    maxWidth: '48%',
   },
   itemImage: {
-    width: '100%', // Adjusted width
+    width: '100%',
     height: 150,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#3B4048',
   },
   placeholderImage: {
     justifyContent: 'center',
@@ -575,14 +575,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 4,
+    color: '#eee',
   },
   itemCategory: {
-    color: '#666',
+    color: '#eee',
     fontSize: 14,
     marginBottom: 4,
   },
   itemAttribute: {
-    color: '#888',
+    color: '#eee',
     fontSize: 12,
   },
   loadingContainer: {
@@ -600,10 +601,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#eee',
   },
   emptySubText: {
     fontSize: 14,
-    color: '#666',
+    color: '#eee',
     textAlign: 'center',
   },
   modalOverlay: {
@@ -612,7 +614,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: '#2D333B',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
@@ -622,35 +624,36 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
+    color: '#fff',
   },
   modalFilterOption: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   modalFilterText: {
     fontSize: 16,
     marginLeft: 10,
-    color: '#666',
+    color: '#ccc',
   },
   modalFilterActive: {
-    color: '#000',
+    color: '#fff',
     fontWeight: 'bold',
   },
   sortOption: {
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   sortOptionText: {
     fontSize: 16,
-    color: '#333',
+    color: '#ccc',
   },
   selectedItemContainer: {
     borderWidth: 2,
-    borderColor: '#000',
+    borderColor: '#3B4048',
   },
   selectionOverlay: {
     position: 'absolute',
@@ -663,13 +666,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkmarkContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#2D333B',
     borderRadius: 16,
     padding: 4,
   },
   header: {
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
     paddingVertical: 8,
   },
   selectionHeader: {
@@ -690,7 +693,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#2D333B',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -709,17 +712,17 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginRight: 8,
-    color: '#000',
+    color: '#fff',
   },
   selectionText: {
     fontSize: 17,
-    color: '#666',
+    color: '#ccc',
   },
   menuContent: {
     position: 'absolute',
     top: 60,
     right: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#2D333B',
     borderRadius: 8,
     elevation: 5,
     minWidth: 180,
@@ -732,6 +735,7 @@ const styles = StyleSheet.create({
   menuText: {
     marginLeft: 12,
     fontSize: 16,
+    color: '#fff',
   },
 });
 

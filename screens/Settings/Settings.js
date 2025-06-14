@@ -171,129 +171,141 @@ const Settings = () => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
-      <Text style={styles.title}>Settings</Text>
-
-      {/* Account Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
-        <TouchableOpacity style={styles.accountButton}>
-          <Ionicons name="person-outline" size={28} color="#333" />
-          <View style={styles.accountInfo}>
-            <Text style={styles.accountEmail}>
-              {user?.email || 'Not signed in'}
-            </Text>
-            {isPremium && (
-              <View style={styles.premiumBadge}>
-                <Ionicons name="star" size={14} color="#fff" />
-                <Text style={styles.premiumText}>Premium</Text>
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Settings</Text>
       </View>
-
-      {/* Pro Box - Only show for non-premium users */}
-      {!isPremium && (
-        <View style={styles.proBox}>
-          <TouchableOpacity
-            style={styles.joinButton}
-            onPress={() => navigation.navigate('SubscriptionIntro')}>
-            <Text style={styles.joinButtonText}>UPGRADE</Text>
-          </TouchableOpacity>
-          <Text style={styles.proTitle}>MyCloset Premium</Text>
-          <Text style={styles.proSubtitle}>
-            Take your style to the next level
-          </Text>
-          <Text style={styles.proPrice}>Starting at $4.99/month</Text>
-        </View>
-      )}
-
-      {/* Stats */}
-      <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{counts.outfits}</Text>
-          <Text style={styles.statLabel}>Outfits</Text>
-        </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{counts.lookbooks}</Text>
-          <Text style={styles.statLabel}>Lookbooks</Text>
-        </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{counts.items}</Text>
-          <Text style={styles.statLabel}>Items</Text>
-        </View>
-      </View>
-
-      {/* Options */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>More Options</Text>
-        {[
-          {
-            icon: 'share-outline',
-            label: 'Share App',
-            onPress: handleShare,
-          },
-          {
-            icon: 'information-circle-outline',
-            label: 'About',
-            onPress: () => {},
-          },
-          {
-            icon: 'shield-checkmark-outline',
-            label: 'Privacy Policy',
-            onPress: () => Linking.openURL('https://mycloset.app/privacy'),
-          },
-          {
-            icon: 'help-circle-outline',
-            label: isPremium ? 'Priority Support' : 'Help & Support',
-            onPress: handleSupport,
-            badge: isPremium ? 'Premium' : null,
-          },
-          {
-            icon: 'settings-outline',
-            label: 'App Settings',
-            onPress: () => {},
-          },
-          {
-            icon: 'star-outline',
-            label: 'Rate Us',
-            onPress: handleRateApp,
-          },
-          {
-            icon: 'log-out-outline',
-            label: 'Logout',
-            onPress: handleLogout,
-            color: '#FF3B30',
-          },
-        ].map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.optionButton}
-            onPress={item.onPress}>
-            <View style={styles.optionLeft}>
-              <Ionicons
-                name={item.icon}
-                size={22}
-                color={item.color || '#444'}
-              />
-              <Text
-                style={[styles.optionLabel, item.color && {color: item.color}]}>
-                {item.label}
+      <View style={styles.content}>
+        {/* Account Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          <TouchableOpacity style={styles.accountButton}>
+            <Ionicons name="person-outline" size={28} color="##FFD66B" />
+            <View style={styles.accountInfo}>
+              <Text style={styles.accountEmail}>
+                {user?.email || 'Not signed in'}
               </Text>
-              {item.badge && (
-                <View style={styles.optionBadge}>
-                  <Text style={styles.optionBadgeText}>{item.badge}</Text>
+              {isPremium && (
+                <View style={styles.premiumBadge}>
+                  <Ionicons name="star" size={14} color="##FFD66B" />
+                  <Text style={styles.premiumText}>Premium</Text>
                 </View>
               )}
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
           </TouchableOpacity>
-        ))}
-      </View>
+        </View>
 
-      <Text style={styles.version}>Version 1.0.0</Text>
+        {/* Pro Box - Only show for non-premium users */}
+        {!isPremium && (
+          <View style={styles.proBox}>
+            <TouchableOpacity
+              style={styles.joinButton}
+              onPress={() => navigation.navigate('SubscriptionIntro')}>
+              <Text style={styles.joinButtonText}>UPGRADE</Text>
+            </TouchableOpacity>
+            <Text style={styles.proTitle}>MyCloset Premium</Text>
+            <Text style={styles.proSubtitle}>
+              Take your style to the next level
+            </Text>
+            <Text style={styles.proPrice}>Starting at $4.99/month</Text>
+          </View>
+        )}
+
+        {/* Stats */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{counts.outfits}</Text>
+            <Text style={styles.statLabel}>Outfits</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{counts.lookbooks}</Text>
+            <Text style={styles.statLabel}>Lookbooks</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>{counts.items}</Text>
+            <Text style={styles.statLabel}>Items</Text>
+          </View>
+        </View>
+
+        {/* Options */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>More Options</Text>
+          {[
+            {
+              icon: 'share-outline',
+              label: 'Share App',
+              onPress: handleShare,
+              color: '#FFD66B',
+            },
+            {
+              icon: 'information-circle-outline',
+              label: 'About',
+              onPress: () => {},
+              color: '#FFD66B',
+            },
+            {
+              icon: 'shield-checkmark-outline',
+              label: 'Privacy Policy',
+              onPress: () => Linking.openURL('https://mycloset.app/privacy'),
+              color: '#FFD66B',
+            },
+            {
+              icon: 'help-circle-outline',
+              label: isPremium ? 'Priority Support' : 'Help & Support',
+              onPress: handleSupport,
+              badge: isPremium ? 'Premium' : null,
+              color: '#FFD66B',
+            },
+            {
+              icon: 'settings-outline',
+              label: 'App Settings',
+              onPress: () => {},
+              color: '#FFD66B',
+            },
+            {
+              icon: 'star-outline',
+              label: 'Rate Us',
+              onPress: handleRateApp,
+              color: '#FFD66B',
+            },
+            {
+              icon: 'log-out-outline',
+              label: 'Logout',
+              onPress: handleLogout,
+              color: '#FF3B30',
+            },
+          ].map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.optionButton}
+              onPress={item.onPress}>
+              <View style={styles.optionLeft}>
+                <Ionicons
+                  name={item.icon}
+                  size={22}
+                  color={item.color || '#444'}
+                />
+                <Text
+                  style={[
+                    styles.optionLabel,
+                    item.color && {color: item.color},
+                  ]}>
+                  {item.label}
+                </Text>
+                {item.badge && (
+                  <View style={styles.optionBadge}>
+                    <Text style={styles.optionBadgeText}>{item.badge}</Text>
+                  </View>
+                )}
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#FFD66B" />
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <Text style={styles.version}>Version 1.0.0</Text>
+      </View>
     </ScrollView>
   );
 };
@@ -301,30 +313,40 @@ const Settings = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
   },
-  title: {
-    margin: 20,
-    marginTop: 25,
-    fontSize: 32,
-    fontWeight: '700',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#3B4048',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#eee',
+  },
+  content: {
+    padding: 16,
   },
   section: {
-    paddingHorizontal: 20,
-    marginTop: 10,
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 10,
-    color: '#000',
+    marginBottom: 12,
+    color: '#eee',
   },
   accountButton: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
     borderRadius: 12,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFD66B',
   },
   accountInfo: {
     flex: 1,
@@ -336,8 +358,8 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   proBox: {
-    backgroundColor: '#000',
-    width: '90%',
+    backgroundColor: '#FFD66B',
+    width: '98%',
     alignSelf: 'center',
     borderRadius: 20,
     marginVertical: 20,
@@ -357,19 +379,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   proTitle: {
-    color: '#fff',
+    color: 'black',
     fontSize: 24,
     fontWeight: '600',
     marginTop: 10,
   },
   proSubtitle: {
-    color: '#fff',
+    color: 'black',
     fontSize: 16,
     marginTop: 5,
     opacity: 0.8,
   },
   proPrice: {
-    color: '#fff',
+    color: 'black',
     fontSize: 20,
     fontWeight: '600',
     marginTop: 10,
@@ -380,8 +402,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 30,
     paddingVertical: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#FFD66B',
     marginVertical: 20,
+    borderRadius: 20,
   },
   statItem: {
     alignItems: 'center',
@@ -407,24 +430,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#2D333B',
+    borderRadius: 12,
+    marginBottom: 8,
   },
   optionLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   optionLabel: {
-    marginLeft: 15,
     fontSize: 16,
-    color: '#333',
+    marginLeft: 12,
+    color: '#eee',
   },
   version: {
     textAlign: 'center',
-    color: '#999',
-    fontSize: 14,
-    marginVertical: 20,
+    color: '#eee',
+    marginTop: 24,
+    marginBottom: 32,
   },
   premiumBadge: {
     flexDirection: 'row',
@@ -443,16 +468,16 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   optionBadge: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: 12,
     marginLeft: 8,
   },
   optionBadgeText: {
-    color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+    color: '#222831',
   },
 });
 

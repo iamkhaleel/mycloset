@@ -154,7 +154,7 @@ const AddOutfit = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color="#FFD66B" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Outfit</Text>
         <TouchableOpacity
@@ -234,7 +234,7 @@ const AddOutfit = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
   },
   header: {
     flexDirection: 'row',
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   backButton: {
     padding: 8,
@@ -251,9 +251,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#eee',
   },
   saveButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 16,
@@ -262,7 +263,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   saveButtonText: {
-    color: '#fff',
+    color: '#222831',
     fontWeight: 'bold',
   },
   content: {
@@ -272,10 +273,13 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   input: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#2D333B',
     padding: 12,
     borderRadius: 8,
     marginBottom: 12,
+    color: '#eee',
+    borderWidth: 1,
+    borderColor: '#FFD66B',
   },
   descriptionInput: {
     height: 80,
@@ -284,13 +288,14 @@ const styles = StyleSheet.create({
   selectedSection: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 12,
     paddingHorizontal: 16,
+    color: '#eee',
   },
   selectedItemPreview: {
     marginRight: 12,
@@ -305,32 +310,32 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: -8,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
     borderRadius: 12,
   },
   emptyText: {
-    color: '#666',
+    color: '#eee',
     fontStyle: 'italic',
   },
   itemContainer: {
     flex: 1,
     margin: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#2D333B',
     borderRadius: 10,
     overflow: 'hidden',
     elevation: 2,
     maxWidth: '46%',
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#3B4048',
   },
   selectedItem: {
-    borderColor: '#000',
+    borderColor: '#FFD66B',
     borderWidth: 2,
   },
   itemImage: {
     width: '100%',
     height: 150,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#3B4048',
   },
   placeholderImage: {
     justifyContent: 'center',
@@ -343,16 +348,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
     marginBottom: 4,
+    color: '#eee',
   },
   itemCategory: {
-    color: '#666',
+    color: '#eee',
     fontSize: 12,
   },
   checkmark: {
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
     borderRadius: 12,
   },
   loader: {

@@ -300,7 +300,7 @@ const AddItem = () => {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{backgroundColor: '#222831', flex: 1}}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{flexDirection: 'row', alignItems: 'center', marginTop: 20}}>
@@ -308,7 +308,7 @@ const AddItem = () => {
             <Image
               source={require('../../assets/images/arrow-left.png')}
               resizeMode="contain"
-              style={{width: 32, height: 32}}
+              style={{width: 32, height: 32, tintColor: '#FFD66B'}}
             />
           </TouchableOpacity>
           <Text
@@ -318,6 +318,7 @@ const AddItem = () => {
               flex: 1,
               textAlign: 'center',
               marginRight: 32,
+              color: '#eee',
             }}>
             New Item
           </Text>
@@ -333,7 +334,7 @@ const AddItem = () => {
               Need Tips on taking a good picture?
             </Text>
             <TouchableOpacity style={styles.guideButton}>
-              <Text>Photo Guide</Text>
+              <Text style={{color: '#eee'}}>Photo Guide</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -360,8 +361,10 @@ const AddItem = () => {
               onPress={handleLaunchCamera}
               style={styles.actionButton}>
               <View style={styles.actionContent}>
-                <Ionicons name="camera" size={30} color="#000" />
-                <Text style={{marginStart: 10}}>Take a Photo</Text>
+                <Ionicons name="camera" size={30} color="#eee" />
+                <Text style={{marginStart: 10, color: '#eee'}}>
+                  Take a Photo
+                </Text>
               </View>
             </TouchableOpacity>
 
@@ -369,8 +372,10 @@ const AddItem = () => {
               onPress={handleLaunchImageLibrary}
               style={styles.actionButton}>
               <View style={styles.actionContent}>
-                <Ionicons name="images" size={30} color="#000" />
-                <Text style={{marginStart: 10}}>Choose from gallery</Text>
+                <Ionicons name="images" size={30} color="#eee" />
+                <Text style={{marginStart: 10, color: '#eee'}}>
+                  Choose from gallery
+                </Text>
               </View>
             </TouchableOpacity>
 
@@ -390,12 +395,12 @@ const AddItem = () => {
                 <Ionicons
                   name={removeBgEnabled ? 'checkmark-circle' : 'cut-outline'}
                   size={30}
-                  color={removeBgEnabled ? '#fff' : '#000'}
+                  color={removeBgEnabled ? '#222831' : '#eee'}
                 />
                 <Text
                   style={[
                     {marginStart: 10},
-                    removeBgEnabled && {color: '#fff'},
+                    {color: removeBgEnabled ? '#222831' : '#eee'},
                   ]}>
                   Remove Background
                 </Text>
@@ -404,14 +409,14 @@ const AddItem = () => {
 
             <TouchableOpacity style={styles.proButton}>
               <View style={styles.actionContent}>
-                <Ionicons name="images-outline" size={30} color="#fff" />
-                <Text style={{marginStart: 10, color: 'white'}}>
+                <Ionicons name="images-outline" size={30} color="#222831" />
+                <Text style={{marginStart: 10, color: '#222831'}}>
                   Add Multiple Photos (up to 15)
                 </Text>
               </View>
               <View style={styles.proBadge}>
-                <Ionicons name="star" size={23} color="#fff" />
-                <Text style={{color: 'white'}}>Pro</Text>
+                <Ionicons name="star" size={23} color="#222831" />
+                <Text style={{color: '#222831'}}>Pro</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -536,11 +541,11 @@ const AddItem = () => {
 const styles = StyleSheet.create({
   imagePlaceholder: {
     borderWidth: 0.3,
-    borderColor: 'black',
+    borderColor: '#FFD66B',
     borderRadius: 30,
     height: 320,
     margin: 15,
-    backgroundColor: 'white',
+    backgroundColor: '#222831',
   },
   placeholderText: {
     padding: 20,
@@ -548,17 +553,18 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     textAlign: 'center',
     fontSize: 18,
+    color: '#eee',
   },
   divider: {
     height: 0.4,
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     marginStart: 70,
     marginEnd: 70,
   },
   guideButton: {
     alignSelf: 'center',
     margin: 10,
-    borderColor: 'black',
+    borderColor: '#FFD66B',
     borderRadius: 5,
     borderWidth: 0.3,
     padding: 10,
@@ -577,11 +583,12 @@ const styles = StyleSheet.create({
   actionButton: {
     alignSelf: 'center',
     margin: 10,
-    borderColor: 'black',
+    borderColor: '#FFD66B',
     borderRadius: 25,
     borderWidth: 0.3,
     padding: 10,
     width: '60%',
+    backgroundColor: '#2D333B',
   },
   actionContent: {
     flexDirection: 'row',
@@ -590,8 +597,8 @@ const styles = StyleSheet.create({
   },
   proButton: {
     alignSelf: 'center',
-    backgroundColor: 'black',
-    borderColor: 'black',
+    backgroundColor: '#FFD66B',
+    borderColor: '#FFD66B',
     borderRadius: 25,
     borderWidth: 0.3,
     padding: 10,
@@ -604,7 +611,7 @@ const styles = StyleSheet.create({
     right: 10,
     width: 67,
     height: 36,
-    backgroundColor: 'black',
+    backgroundColor: '#FFD66B',
     borderRadius: 10,
     flexDirection: 'row',
     padding: 3,
@@ -613,7 +620,7 @@ const styles = StyleSheet.create({
   },
   orDivider: {
     height: 0.4,
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     marginStart: 70,
     marginEnd: 70,
     margin: 50,
@@ -621,7 +628,7 @@ const styles = StyleSheet.create({
   orCircle: {
     width: 36,
     height: 36,
-    backgroundColor: 'black',
+    backgroundColor: '#FFD66B',
     alignItems: 'center',
     alignSelf: 'center',
     borderRadius: 50,
@@ -634,38 +641,42 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     width: '50%',
-    borderColor: 'black',
+    borderColor: '#FFD66B',
     borderWidth: 2,
     borderRadius: 5,
   },
   dropdownText: {
     fontSize: 16,
-    color: '#000',
+    color: '#eee',
   },
   dropdownButton: {
     padding: 10,
     borderBottomWidth: 1,
+    borderBottomColor: '#FFD66B',
   },
   dropdownButtonText: {
     fontSize: 16,
-    color: '#000',
+    color: '#eee',
   },
   input: {
     borderBottomWidth: 1,
     marginVertical: 10,
     padding: 8,
+    borderBottomColor: '#FFD66B',
+    color: '#eee',
   },
   removeImageButton: {
     flexDirection: 'row',
     alignSelf: 'center',
     margin: 10,
-    borderColor: 'black',
+    borderColor: '#FFD66B',
     borderRadius: 5,
     borderWidth: 0.3,
     padding: 10,
   },
   removeImageText: {
     paddingStart: 10,
+    color: '#eee',
   },
   colorIndicator: {
     width: 20,
@@ -679,17 +690,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(34, 40, 49, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   processingText: {
-    color: '#fff',
+    color: '#FFD66B',
     marginTop: 10,
     fontSize: 16,
   },
   activeButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
   },
   header: {
     flexDirection: 'row',
@@ -698,13 +709,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   photoGuideButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FFD66B',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
   },
   photoGuideButtonText: {
-    color: '#fff',
+    color: '#222831',
     fontSize: 14,
     fontWeight: '600',
   },

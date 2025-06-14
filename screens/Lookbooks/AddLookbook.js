@@ -127,7 +127,7 @@ const AddLookbook = () => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color="#FFD66B" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Lookbook</Text>
         <TouchableOpacity
@@ -215,19 +215,26 @@ const AddLookbook = () => {
             <View
               key={outfit.id}
               style={[
-                styles.outfitCard,
+                styles.outfitContainer,
                 selectedOutfits.find(selected => selected.id === outfit.id) &&
-                  styles.selectedOutfitCard,
+                  styles.selectedOutfit,
               ]}>
-              <OutfitCard
-                outfit={outfit}
-                onPress={() => toggleOutfitSelection(outfit)}
+              <Image
+                source={{uri: outfit.items[0]?.imageUrl}}
+                style={styles.outfitImage}
+                resizeMode="cover"
               />
-              {selectedOutfits.find(selected => selected.id === outfit.id) && (
-                <View style={styles.selectionOverlay}>
-                  <Ionicons name="checkmark-circle" size={32} color="#000" />
-                </View>
-              )}
+              <View style={styles.outfitDetails}>
+                <Text style={styles.outfitName}>{outfit.name}</Text>
+                <Text style={styles.outfitCategory}>{outfit.category}</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.checkmark}
+                onPress={() => toggleOutfitSelection(outfit)}>
+                {selectedOutfits.find(
+                  selected => selected.id === outfit.id,
+                ) && <Ionicons name="checkmark" size={20} color="#FFD66B" />}
+              </TouchableOpacity>
             </View>
           ))
         ) : (
@@ -246,7 +253,7 @@ const AddLookbook = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
   },
   header: {
     flexDirection: 'row',
@@ -255,7 +262,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   backButton: {
     padding: 8,
@@ -263,9 +270,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#eee',
   },
   saveButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 16,
@@ -274,7 +282,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   saveButtonText: {
-    color: '#fff',
+    color: '#222831',
     fontWeight: 'bold',
   },
   content: {
@@ -284,10 +292,13 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   input: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#2D333B',
     padding: 12,
     borderRadius: 8,
     marginBottom: 12,
+    color: '#eee',
+    borderWidth: 1,
+    borderColor: '#FFD66B',
   },
   descriptionInput: {
     height: 80,
@@ -316,13 +327,14 @@ const styles = StyleSheet.create({
   selectedSection: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 12,
     paddingHorizontal: 16,
+    color: '#eee',
   },
   selectedOutfitPreview: {
     marginRight: 12,
@@ -337,11 +349,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: -8,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
     borderRadius: 12,
   },
   emptyText: {
-    color: '#666',
+    color: '#eee',
     fontStyle: 'italic',
   },
   emptyContainer: {
@@ -353,21 +365,45 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  outfitCard: {
-    marginBottom: 8,
-    position: 'relative',
+  outfitContainer: {
+    flex: 1,
+    margin: 8,
+    backgroundColor: '#2D333B',
+    borderRadius: 10,
+    overflow: 'hidden',
+    elevation: 2,
+    maxWidth: '46%',
+    borderWidth: 1,
+    borderColor: '#3B4048',
   },
-  selectedOutfitCard: {
-    opacity: 0.9,
+  selectedOutfit: {
+    borderColor: '#FFD66B',
+    borderWidth: 2,
   },
-  selectionOverlay: {
+  outfitImage: {
+    width: '100%',
+    height: 150,
+    backgroundColor: '#3B4048',
+  },
+  outfitDetails: {
+    padding: 10,
+  },
+  outfitName: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    marginBottom: 4,
+    color: '#eee',
+  },
+  outfitCategory: {
+    color: '#eee',
+    fontSize: 12,
+  },
+  checkmark: {
     position: 'absolute',
-    top: 16,
-    right: 32,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 4,
-    elevation: 4,
+    top: 8,
+    right: 8,
+    backgroundColor: '#222831',
+    borderRadius: 12,
   },
   loader: {
     marginTop: 20,

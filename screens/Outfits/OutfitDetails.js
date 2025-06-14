@@ -73,7 +73,7 @@ const OutfitDetails = ({route}) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color="#FFD66B" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {outfit.name || 'Unnamed Outfit'}
@@ -133,7 +133,7 @@ const OutfitDetails = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
   },
   loadingContainer: {
     flex: 1,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   backButton: {
     padding: 8,
@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#eee',
   },
   placeholder: {
     width: 40,
@@ -164,10 +165,10 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    color: '#666',
+    color: '#eee',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   itemsContainer: {
     padding: 16,
@@ -176,22 +177,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: '#eee',
   },
   itemCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#eee',
     borderRadius: 12,
     marginBottom: 12,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#3B4048',
   },
   itemImage: {
     width: 60,
     height: 60,
     borderRadius: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#3B4048',
   },
   placeholderImage: {
     justifyContent: 'center',
@@ -205,6 +207,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: '#222831',
   },
   itemCategory: {
     fontSize: 14,

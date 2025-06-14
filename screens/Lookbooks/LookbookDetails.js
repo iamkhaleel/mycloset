@@ -59,7 +59,7 @@ const LookbookDetails = ({route}) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color="#FFD66B" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{lookbook.name}</Text>
         <View style={styles.placeholder} />
@@ -120,7 +120,7 @@ const LookbookDetails = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
   },
   loadingContainer: {
     flex: 1,
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   backButton: {
     padding: 8,
@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#eee',
   },
   placeholder: {
     width: 40,
@@ -151,10 +152,10 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
-    color: '#666',
+    color: '#eee',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   themeContainer: {
     flexDirection: 'row',
@@ -162,22 +163,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#3B4048',
   },
   themeLabel: {
     fontSize: 16,
-    color: '#666',
+    color: '#eee',
     marginRight: 8,
   },
   themeTag: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#2D333B',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   themeText: {
     fontSize: 14,
-    color: '#000',
+    color: '#eee',
   },
   outfitsContainer: {
     padding: 16,
@@ -186,16 +187,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: '#eee',
   },
   outfitCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#eee',
     borderRadius: 12,
     marginBottom: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#3B4048',
   },
   outfitInfo: {
     flex: 1,
@@ -204,6 +206,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: '#222831',
   },
   itemCount: {
     fontSize: 14,

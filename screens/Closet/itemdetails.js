@@ -27,7 +27,7 @@ const ItemDetails = ({route}) => {
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={24} color="#000" />
+        <Ionicons name="arrow-back" size={24} color="#FFD66B" />
       </TouchableOpacity>
 
       {/* Item Image */}
@@ -41,7 +41,7 @@ const ItemDetails = ({route}) => {
           />
         ) : (
           <View style={[styles.itemImage, styles.placeholderImage]}>
-            <Ionicons name="image" size={60} color="#ccc" />
+            <Ionicons name="image" size={60} color="#FFD66B" />
           </View>
         )}
       </View>
@@ -86,7 +86,7 @@ const ItemDetails = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#222831',
   },
   backButton: {
     padding: 15,
@@ -107,9 +107,11 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     padding: 20,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: '#eee',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginLeft: 20,
+    marginRight: 20,
   },
   itemName: {
     fontSize: 24,
@@ -123,7 +125,7 @@ const styles = StyleSheet.create({
   },
   itemAttribute: {
     fontSize: 16,
-    color: '#888',
+    color: '#222831',
     marginBottom: 8,
   },
 });
