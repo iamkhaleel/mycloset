@@ -333,7 +333,9 @@ const AddItem = () => {
             <Text style={styles.placeholderText}>
               Need Tips on taking a good picture?
             </Text>
-            <TouchableOpacity style={styles.guideButton}>
+            <TouchableOpacity
+              style={styles.guideButton}
+              onPress={() => setShowPhotoGuide(true)}>
               <Text style={{color: '#eee'}}>Photo Guide</Text>
             </TouchableOpacity>
           </View>

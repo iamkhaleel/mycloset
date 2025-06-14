@@ -163,11 +163,6 @@ const Lookbooks = () => {
             </>
           ) : (
             <>
-              <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={24} color="#FFD66B" />
-              </TouchableOpacity>
               <Text style={styles.headerTitle}>Lookbooks</Text>
               <View style={styles.headerRight}>
                 <TouchableOpacity
@@ -314,9 +309,10 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#eee',
+    alignSelf: 'center',
   },
   placeholder: {
     width: 40,
@@ -345,14 +341,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   themeTag: {
-    backgroundColor: '#2D333B',
+    backgroundColor: '#FFD66B',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   themeText: {
     fontSize: 14,
-    color: '#eee',
+    color: '#222831',
   },
   outfitsContainer: {
     padding: 16,

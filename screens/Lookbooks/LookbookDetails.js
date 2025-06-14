@@ -171,14 +171,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   themeTag: {
-    backgroundColor: '#2D333B',
+    backgroundColor: '#FFD66B',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   themeText: {
     fontSize: 14,
-    color: '#eee',
+    color: '#222831',
   },
   outfitsContainer: {
     padding: 16,

@@ -12,33 +12,58 @@ const Tab = createBottomTabNavigator();
 const MainTabNavigator = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Closet"
-      screenOptions={({route}) => ({
-        tabBarIcon: ({focused, color, size}) => {
-          let iconName;
-
-          if (route.name === 'Closet') {
-            iconName = focused ? 'shirt' : 'shirt-outline';
-          } else if (route.name === 'Outfits') {
-            iconName = focused ? 'pricetags' : 'pricetags-outline';
-          } else if (route.name === 'Lookbooks') {
-            iconName = focused ? 'images' : 'images-outline';
-          } else if (route.name === 'Settings') {
-            iconName = focused ? 'settings' : 'settings-outline';
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
+      screenOptions={{
         headerShown: false,
-      })}
-      tabBarOptions={{
-        activeTintColor: 'blue',
-        inactiveTintColor: 'gray',
+        tabBarStyle: {
+          backgroundColor: '#222831',
+          borderTopColor: '#3B4048',
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: '#FFD66B',
+        tabBarInactiveTintColor: '#eee',
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
       }}>
-      <Tab.Screen name="Closet" component={ClosetTabs} />
-      <Tab.Screen name="Outfits" component={Outfits} />
-      <Tab.Screen name="Lookbooks" component={Lookbooks} />
-      <Tab.Screen name="Settings" component={Settings} />
+      <Tab.Screen
+        name="Closet"
+        component={ClosetTabs}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <Ionicons name="shirt-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Outfits"
+        component={Outfits}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <Ionicons name="pricetags-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Lookbooks"
+        component={Lookbooks}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <Ionicons name="book-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };

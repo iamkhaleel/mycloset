@@ -212,30 +212,26 @@ const AddLookbook = () => {
           <ActivityIndicator size="large" style={styles.loader} />
         ) : outfits.length > 0 ? (
           outfits.map(outfit => (
-            <View
+            <TouchableOpacity
               key={outfit.id}
               style={[
                 styles.outfitContainer,
                 selectedOutfits.find(selected => selected.id === outfit.id) &&
                   styles.selectedOutfit,
-              ]}>
-              <Image
-                source={{uri: outfit.items[0]?.imageUrl}}
-                style={styles.outfitImage}
-                resizeMode="cover"
-              />
+              ]}
+              onPress={() => toggleOutfitSelection(outfit)}>
               <View style={styles.outfitDetails}>
                 <Text style={styles.outfitName}>{outfit.name}</Text>
-                <Text style={styles.outfitCategory}>{outfit.category}</Text>
+                <Text style={styles.outfitCategory}>
+                  {outfit.items?.length || 0} items
+                </Text>
               </View>
-              <TouchableOpacity
-                style={styles.checkmark}
-                onPress={() => toggleOutfitSelection(outfit)}>
-                {selectedOutfits.find(
-                  selected => selected.id === outfit.id,
-                ) && <Ionicons name="checkmark" size={20} color="#FFD66B" />}
-              </TouchableOpacity>
-            </View>
+              {selectedOutfits.find(selected => selected.id === outfit.id) && (
+                <View style={styles.checkmark}>
+                  <Ionicons name="checkmark" size={20} color="#FFD66B" />
+                </View>
+              )}
+            </TouchableOpacity>
           ))
         ) : (
           <View style={styles.emptyContainer}>
@@ -316,13 +312,13 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   selectedTheme: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
   },
   themeText: {
     color: '#666',
   },
   selectedThemeText: {
-    color: '#fff',
+    color: '#222831',
   },
   selectedSection: {
     padding: 16,
@@ -372,38 +368,33 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     elevation: 2,
-    maxWidth: '46%',
+    maxWidth: '100%',
     borderWidth: 1,
     borderColor: '#3B4048',
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   selectedOutfit: {
     borderColor: '#FFD66B',
     borderWidth: 2,
   },
-  outfitImage: {
-    width: '100%',
-    height: 150,
-    backgroundColor: '#3B4048',
-  },
   outfitDetails: {
-    padding: 10,
+    flex: 1,
   },
   outfitName: {
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 4,
     color: '#eee',
   },
   outfitCategory: {
     color: '#eee',
-    fontSize: 12,
+    fontSize: 14,
   },
   checkmark: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#222831',
-    borderRadius: 12,
+    marginLeft: 12,
   },
   loader: {
     marginTop: 20,
