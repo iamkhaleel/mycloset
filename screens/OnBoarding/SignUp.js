@@ -30,7 +30,7 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -290,7 +290,7 @@ const SignUp = () => {
         </View>
       </View>
 
-      {/* Remember Me */}
+      {/* Remember Me 
       <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
         <TouchableOpacity
           onPress={() => setRememberMe(!rememberMe)}
@@ -304,6 +304,7 @@ const SignUp = () => {
           </Text>
         </TouchableOpacity>
       </View>
+*/}
 
       {/* Sign Up Button */}
       {loading ? (
@@ -444,7 +445,7 @@ const styles = StyleSheet.create({
     minHeight: 50,
     backgroundColor: '#FFD66B',
     borderRadius: 10,
-    margin: 5,
+    marginTop: 20,
     alignSelf: 'center',
     width: width * 0.7,
   },

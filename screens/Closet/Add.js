@@ -430,6 +430,7 @@ const AddItem = () => {
               value={name}
               onChangeText={setName}
               style={styles.input}
+              placeholderTextColor={'#eee'}
             />
             {/* Category Dropdown */}
             <View style={styles.dropdownContainer}>
@@ -450,6 +451,7 @@ const AddItem = () => {
               value={subCategory}
               onChangeText={setSubCategory}
               style={styles.input}
+              placeholderTextColor={'#eee'}
             />
 
             {/* Brand Input */}
@@ -458,6 +460,7 @@ const AddItem = () => {
               value={brand}
               onChangeText={setBrand}
               style={styles.input}
+              placeholderTextColor={'#eee'}
             />
 
             {/* Size Input */}
@@ -466,6 +469,7 @@ const AddItem = () => {
               value={size}
               onChangeText={setSize}
               style={styles.input}
+              placeholderTextColor={'#eee'}
             />
 
             {/* Material Dropdown */}
@@ -488,8 +492,10 @@ const AddItem = () => {
                 defaultValue="Select Color"
                 renderRow={renderColorItem}
                 onSelect={(index, value) => setColor(value)}
-                textStyle={styles.dropdownText}
                 dropdownStyle={styles.dropdown}
+                dropdownTextStyle={styles.dropdownText}
+                style={styles.dropdownButton}
+                textStyle={styles.dropdownButtonText}
                 renderButtonText={rowData => rowData.name}
               />
             </View>
@@ -501,6 +507,7 @@ const AddItem = () => {
               onChangeText={setPrice}
               keyboardType="numeric"
               style={styles.input}
+              placeholderTextColor={'#eee'}
             />
 
             {/* Note Input */}
@@ -510,12 +517,13 @@ const AddItem = () => {
               onChangeText={setNote}
               multiline
               style={[styles.input, {minHeight: 60}]}
+              placeholderTextColor={'#eee'}
             />
 
             <TouchableOpacity
               style={styles.removeImageButton}
               onPress={handleRemoveImage}>
-              <Ionicons name="remove-circle" size={20} color="black" />
+              <Ionicons name="remove-circle" size={20} color="#FFD66B" />
               <Text style={styles.removeImageText}>Remove image</Text>
             </TouchableOpacity>
 
@@ -523,6 +531,8 @@ const AddItem = () => {
               title={loading ? 'Uploading...' : 'Create Item'}
               onPress={uploadToFirestore}
               disabled={loading || !selectedImage || !category}
+              buttonStyle={{backgroundColor: '#FFD66B'}}
+              textStyle={{color: '#222831'}}
             />
 
             {loading && (
@@ -640,6 +650,8 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     borderBottomWidth: 1,
     marginVertical: 10,
+    borderRadius: 15,
+    textAlign: 'center',
   },
   dropdown: {
     width: '50%',
@@ -649,7 +661,7 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 16,
-    color: '#eee',
+    color: '#222831',
   },
   dropdownButton: {
     padding: 10,
