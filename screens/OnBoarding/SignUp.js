@@ -388,6 +388,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 2,
     backgroundColor: '#f2faff',
+    height: 50,
   },
   inputIcon: {
     width: 20,

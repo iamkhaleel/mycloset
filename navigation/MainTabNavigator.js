@@ -17,8 +17,8 @@ const MainTabNavigator = () => {
         tabBarStyle: {
           backgroundColor: '#222831',
           borderTopColor: '#3B4048',
-          height: 60,
-          paddingBottom: 8,
+          height: 100,
+          paddingBottom: '15%',
           paddingTop: 8,
         },
         tabBarActiveTintColor: '#FFD66B',
@@ -29,7 +29,7 @@ const MainTabNavigator = () => {
         },
       }}>
       <Tab.Screen
-        name="Closet"
+        name="Closets"
         component={ClosetTabs}
         options={{
           tabBarIcon: ({color, size}) => (

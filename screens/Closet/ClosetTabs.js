@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: '10%',
+    marginTop: '15%',
     backgroundColor: '#222831',
   },
   tab: {

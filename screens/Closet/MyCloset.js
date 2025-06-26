@@ -348,7 +348,8 @@ const MyCloset = () => {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.filterBar}>
+        contentContainerStyle={{flexGrow: 0}}
+        style={{flexGrow: 0, marginTop: 10, height: 50}}>
         {FILTERS.map((filter, index) => (
           <TouchableOpacity
             key={index}
@@ -505,7 +506,6 @@ const styles = StyleSheet.create({
   filterBar: {
     paddingVertical: 10,
     paddingHorizontal: 10,
-    backgroundColor: 'transparent',
   },
   filterBtn: {
     marginRight: 8,

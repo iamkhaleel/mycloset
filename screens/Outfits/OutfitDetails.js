@@ -73,7 +73,7 @@ const OutfitDetails = ({route}) => {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#FFD66B" />
+          <Ionicons name="arrow-back" size={34} color="#FFD66B" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {outfit.name || 'Unnamed Outfit'}
@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#222831',
+    paddingTop: 50,
   },
   loadingContainer: {
     flex: 1,

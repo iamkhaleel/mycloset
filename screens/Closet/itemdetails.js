@@ -27,7 +27,7 @@ const ItemDetails = ({route}) => {
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={24} color="#FFD66B" />
+        <Ionicons name="arrow-back" size={34} color="#FFD66B" />
       </TouchableOpacity>
 
       {/* Item Image */}
@@ -90,6 +90,8 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 15,
+    marginStart: '2%',
+    marginTop: '10%',
   },
   imageContainer: {
     alignItems: 'center',

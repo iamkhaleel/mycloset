@@ -144,12 +144,14 @@ const AddLookbook = () => {
         <View style={styles.inputContainer}>
           <TextInput
             placeholder="Lookbook Name"
+            placeholderTextColor={'white'}
             value={name}
             onChangeText={setName}
             style={styles.input}
           />
           <TextInput
             placeholder="Description (optional)"
+            placeholderTextColor={'white'}
             value={description}
             onChangeText={setDescription}
             style={[styles.input, styles.descriptionInput]}

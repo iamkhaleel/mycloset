@@ -171,12 +171,14 @@ const AddOutfit = () => {
         <View style={styles.inputContainer}>
           <TextInput
             placeholder="Outfit Name"
+            placeholderTextColor={'#eee'}
             value={name}
             onChangeText={setName}
             style={styles.input}
           />
           <TextInput
             placeholder="Description (optional)"
+            placeholderTextColor={'#eee'}
             value={description}
             onChangeText={setDescription}
             style={[styles.input, styles.descriptionInput]}
