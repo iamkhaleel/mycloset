@@ -13,6 +13,40 @@ import {View, ActivityIndicator} from 'react-native';
 
 const Stack = createStackNavigator();
 
+const springTransition = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 500,
+    mass: 3,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+};
+
+const cardStyleInterpolator = ({current, layouts}) => {
+  return {
+    cardStyle: {
+      transform: [
+        {
+          translateX: current.progress.interpolate({
+            inputRange: [0, 1],
+            outputRange: [layouts.screen.width, 0],
+          }),
+        },
+      ],
+      opacity: current.progress,
+    },
+    overlayStyle: {
+      opacity: current.progress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 0.5],
+      }),
+    },
+  };
+};
+
 const OnboardingStack = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
@@ -32,7 +66,15 @@ const OnboardingStack = () => {
   return (
     <Stack.Navigator
       initialRouteName="FeaturesIntro"
-      screenOptions={{headerShown: false}}>
+      screenOptions={{
+        headerShown: false,
+        cardStyle: {backgroundColor: '#222831'},
+        transitionSpec: {
+          open: springTransition,
+          close: springTransition,
+        },
+        cardStyleInterpolator,
+      }}>
       <Stack.Screen name="FeaturesIntro" component={FeaturesIntro} />
       <Stack.Screen name="SubscriptionIntro" component={SubscriptionIntro} />
       <Stack.Screen name="Welcome" component={WelcomeScreen} />

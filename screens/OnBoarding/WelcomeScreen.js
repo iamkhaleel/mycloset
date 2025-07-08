@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, Image, Dimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {appName} from '../../config';
 import ResponsiveButton from '../../components/Button';
+import AnimatedScreen from '../../components/AnimatedScreen';
 
 const {width, height} = Dimensions.get('window');
 
@@ -18,7 +19,10 @@ const WelcomeScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen
+      animation="fadeInUp"
+      duration={900}
+      style={styles.container}>
       <View style={styles.logoContainer}>
         <Image
           source={require('../../assets/images/logo.png')}
@@ -44,7 +48,7 @@ const WelcomeScreen = () => {
           textStyle={styles.secondaryButtonText}
         />
       </View>
-    </View>
+    </AnimatedScreen>
   );
 };
 

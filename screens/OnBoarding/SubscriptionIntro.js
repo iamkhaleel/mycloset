@@ -9,6 +9,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import ResponsiveButton from '../../components/Button';
+import AnimatedScreen from '../../components/AnimatedScreen';
 
 const {width, height} = Dimensions.get('window');
 
@@ -71,7 +72,10 @@ const SubscriptionIntro = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <AnimatedScreen
+      animation="fadeInUp"
+      duration={900}
+      style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Unlock Premium Features</Text>
@@ -133,7 +137,7 @@ const SubscriptionIntro = () => {
           <Text style={styles.skipText}>Maybe later</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </AnimatedScreen>
   );
 };
 

@@ -11,6 +11,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import ResponsiveButton from '../../components/Button';
+import AnimatedScreen from '../../components/AnimatedScreen';
 
 const {width, height} = Dimensions.get('window');
 const scale = size => (width / 375) * size;
@@ -47,7 +48,7 @@ const FeaturesIntro = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <AnimatedScreen animation="fadeInUp" duration={900} style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Image
@@ -86,7 +87,7 @@ const FeaturesIntro = () => {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </AnimatedScreen>
   );
 };
 

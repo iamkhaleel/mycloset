@@ -12,11 +12,53 @@ import LookbookDetails from '../screens/Lookbooks/LookbookDetails';
 
 const Stack = createStackNavigator();
 
+const springTransition = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 500,
+    mass: 3,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+};
+
+const cardStyleInterpolator = ({current, layouts}) => {
+  return {
+    cardStyle: {
+      transform: [
+        {
+          translateX: current.progress.interpolate({
+            inputRange: [0, 1],
+            outputRange: [layouts.screen.width, 0],
+          }),
+        },
+      ],
+      opacity: current.progress,
+    },
+    overlayStyle: {
+      opacity: current.progress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 0.5],
+      }),
+    },
+  };
+};
+
 const AppNavigator = () => {
   return (
     <Stack.Navigator
       initialRouteName="Onboarding"
-      screenOptions={{headerShown: false}}>
+      screenOptions={{
+        headerShown: false,
+        cardStyle: {backgroundColor: '#222831'},
+        transitionSpec: {
+          open: springTransition,
+          close: springTransition,
+        },
+        cardStyleInterpolator,
+      }}>
       {/* Onboarding Stack contains Welcome, Login, SignUp screens */}
       <Stack.Screen
         name="Onboarding"
