@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#222831',
+    marginTop: 20,
   },
   scrollContent: {
     padding: width * 0.05,
