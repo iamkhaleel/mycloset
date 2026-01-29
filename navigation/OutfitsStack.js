@@ -59,7 +59,34 @@ const OutfitsStack = () => {
         },
       }}>
       <Stack.Screen name="OutfitsMain" component={Outfits} />
-      <Stack.Screen name="OutfitDetails" component={OutfitDetails} />
+      <Stack.Screen 
+        name="OutfitDetails" 
+        component={OutfitDetails}
+        options={{
+          cardStyle: {backgroundColor: '#222831'},
+          cardStyleInterpolator: ({current, layouts}) => {
+            return {
+              cardStyle: {
+                transform: [
+                  {
+                    translateX: current.progress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [layouts.screen.width, 0],
+                    }),
+                  },
+                ],
+                backgroundColor: '#222831', // Ensure dark background during transition
+              },
+              overlayStyle: {
+                opacity: current.progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 0.5],
+                }),
+              },
+            };
+          },
+        }}
+      />
       <Stack.Screen name="AddOutfit" component={AddOutfit} />
     </Stack.Navigator>
   );

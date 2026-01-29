@@ -36,6 +36,7 @@ const cardStyleInterpolator = ({current, layouts}) => {
         },
       ],
       opacity: current.progress,
+      backgroundColor: '#222831', // Ensure dark background during transition
     },
     overlayStyle: {
       opacity: current.progress.interpolate({
@@ -87,13 +88,67 @@ const AppNavigator = () => {
       <Stack.Screen name="AddOutfit" component={AddOutfit} />
 
       {/* Outfit Details Screen */}
-      <Stack.Screen name="OutfitDetails" component={OutfitDetails} />
+      <Stack.Screen 
+        name="OutfitDetails" 
+        component={OutfitDetails}
+        options={{
+          cardStyle: {backgroundColor: '#222831'},
+          cardStyleInterpolator: ({current, layouts}) => {
+            return {
+              cardStyle: {
+                transform: [
+                  {
+                    translateX: current.progress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [layouts.screen.width, 0],
+                    }),
+                  },
+                ],
+                backgroundColor: '#222831', // Ensure dark background always
+              },
+              overlayStyle: {
+                opacity: current.progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 0.5],
+                }),
+              },
+            };
+          },
+        }}
+      />
 
       {/* Add Lookbook Screen */}
       <Stack.Screen name="AddLookbook" component={AddLookbook} />
 
       {/* Lookbook Details Screen */}
-      <Stack.Screen name="LookbookDetails" component={LookbookDetails} />
+      <Stack.Screen 
+        name="LookbookDetails" 
+        component={LookbookDetails}
+        options={{
+          cardStyle: {backgroundColor: '#222831'},
+          cardStyleInterpolator: ({current, layouts}) => {
+            return {
+              cardStyle: {
+                transform: [
+                  {
+                    translateX: current.progress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [layouts.screen.width, 0],
+                    }),
+                  },
+                ],
+                backgroundColor: '#222831', // Ensure dark background always
+              },
+              overlayStyle: {
+                opacity: current.progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 0.5],
+                }),
+              },
+            };
+          },
+        }}
+      />
     </Stack.Navigator>
   );
 };

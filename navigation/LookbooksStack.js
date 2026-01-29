@@ -48,6 +48,7 @@ const LookbooksStack = () => {
                 },
               ],
               opacity: current.progress,
+              backgroundColor: '#222831', // Ensure dark background during transition
             },
             overlayStyle: {
               opacity: current.progress.interpolate({
@@ -59,7 +60,34 @@ const LookbooksStack = () => {
         },
       }}>
       <Stack.Screen name="LookbooksMain" component={Lookbooks} />
-      <Stack.Screen name="LookbookDetails" component={LookbookDetails} />
+      <Stack.Screen 
+        name="LookbookDetails" 
+        component={LookbookDetails}
+        options={{
+          cardStyle: {backgroundColor: '#222831'},
+          cardStyleInterpolator: ({current, layouts}) => {
+            return {
+              cardStyle: {
+                transform: [
+                  {
+                    translateX: current.progress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [layouts.screen.width, 0],
+                    }),
+                  },
+                ],
+                backgroundColor: '#222831', // Ensure dark background during transition
+              },
+              overlayStyle: {
+                opacity: current.progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 0.5],
+                }),
+              },
+            };
+          },
+        }}
+      />
       <Stack.Screen name="AddLookbook" component={AddLookbook} />
     </Stack.Navigator>
   );
