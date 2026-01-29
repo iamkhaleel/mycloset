@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {getUserDocs, deleteUserDoc} from '../../utils/FirestoreService';
 import OutfitCard from '../../components/OutfitCard';
 import {
@@ -52,6 +52,13 @@ const Outfits = () => {
     checkUserPremiumStatus();
     fetchOutfits();
   }, []);
+
+  // Auto-refresh when screen comes into focus (e.g., after adding an outfit)
+  useFocusEffect(
+    useCallback(() => {
+      fetchOutfits();
+    }, []),
+  );
 
   const checkUserPremiumStatus = async () => {
     const premium = await checkPremiumStatus();
@@ -417,25 +424,17 @@ const styles = StyleSheet.create({
   },
   floatingBtn: {
     position: 'absolute',
-    bottom: 32,
-    right: 32,
+    bottom: 30,
+    right: 20,
     backgroundColor: '#FFD66B',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     elevation: 5,
   },
   floatingText: {
     color: '#222831',
-    fontWeight: '600',
-    fontSize: 16,
+    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,

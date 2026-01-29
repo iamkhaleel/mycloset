@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  Animated,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
@@ -43,6 +44,36 @@ const FeaturesIntro = () => {
     },
   ];
 
+  // Create animated values for each feature
+  const slideAnimations = useRef(
+    features.map(() => ({
+      translateX: new Animated.Value(100),
+      opacity: new Animated.Value(0),
+    })),
+  ).current;
+
+  useEffect(() => {
+    // Animate each feature card with staggered delays
+    const animations = slideAnimations.map((anim, index) => {
+      return Animated.parallel([
+        Animated.timing(anim.translateX, {
+          toValue: 0,
+          duration: 500,
+          delay: index * 150, // 150ms delay between each card
+          useNativeDriver: true,
+        }),
+        Animated.timing(anim.opacity, {
+          toValue: 1,
+          duration: 500,
+          delay: index * 150,
+          useNativeDriver: true,
+        }),
+      ]);
+    });
+
+    Animated.stagger(0, animations).start();
+  }, []);
+
   const handleNext = () => {
     navigation.navigate('SubscriptionIntro');
   };
@@ -63,19 +94,30 @@ const FeaturesIntro = () => {
         </View>
 
         <View style={styles.featuresContainer}>
-          {features.map((feature, index) => (
-            <View key={index} style={styles.featureCard}>
-              <View style={styles.iconContainer}>
-                <Ionicons name={feature.icon} size={28} color="#FFD66B" />
-              </View>
-              <View style={styles.featureContent}>
-                <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDescription}>
-                  {feature.description}
-                </Text>
-              </View>
-            </View>
-          ))}
+          {features.map((feature, index) => {
+            const anim = slideAnimations[index];
+            return (
+              <Animated.View
+                key={index}
+                style={[
+                  styles.featureCard,
+                  {
+                    transform: [{translateX: anim.translateX}],
+                    opacity: anim.opacity,
+                  },
+                ]}>
+                <View style={styles.iconContainer}>
+                  <Ionicons name={feature.icon} size={28} color="#FFD66B" />
+                </View>
+                <View style={styles.featureContent}>
+                  <Text style={styles.featureTitle}>{feature.title}</Text>
+                  <Text style={styles.featureDescription}>
+                    {feature.description}
+                  </Text>
+                </View>
+              </Animated.View>
+            );
+          })}
         </View>
 
         <View style={styles.footer}>

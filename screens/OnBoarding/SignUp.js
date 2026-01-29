@@ -351,6 +351,15 @@ const SignUp = () => {
           */}
         </View>
       </View>
+
+      {/* Login Link */}
+      <TouchableOpacity
+        style={styles.linkButton}
+        onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.linkText}>
+          Already have an account? <Text style={styles.linkTextBold}>Log In</Text>
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -455,6 +464,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     textAlign: 'center',
+  },
+  linkButton: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  linkText: {
+    fontSize: 14,
+    color: '#FFD66B',
+    textAlign: 'center',
+  },
+  linkTextBold: {
+    fontWeight: 'bold',
+    color: '#FFD66B',
   },
 });
 

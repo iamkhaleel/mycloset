@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
   Pressable,
   SafeAreaView,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {getUserDocs, deleteUserDoc} from '../../utils/FirestoreService';
 import LookbookCard from '../../components/LookbookCard';
 import Ionicons from '@react-native-vector-icons/ionicons';
@@ -51,6 +51,13 @@ const Lookbooks = () => {
     checkUserPremiumStatus();
     fetchLookbooks();
   }, []);
+
+  // Auto-refresh when screen comes into focus (e.g., after adding a lookbook)
+  useFocusEffect(
+    useCallback(() => {
+      fetchLookbooks();
+    }, []),
+  );
 
   const checkUserPremiumStatus = async () => {
     const premium = await checkPremiumStatus();
@@ -488,18 +495,17 @@ const styles = StyleSheet.create({
   },
   floatingBtn: {
     position: 'absolute',
-    bottom: 32,
-    right: 32,
+    bottom: 30,
+    right: 20,
     backgroundColor: '#FFD66B',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 24,
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     elevation: 5,
   },
   floatingText: {
     color: '#222831',
-    fontWeight: '600',
-    fontSize: 16,
+    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,
