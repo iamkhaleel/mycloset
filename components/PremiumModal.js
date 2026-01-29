@@ -22,11 +22,11 @@ const PremiumModal = ({visible, onClose, onUpgrade, featureName}) => {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={24} color="#000" />
+            <Ionicons name="close" size={24} color="#FFD66B" />
           </TouchableOpacity>
 
           <View style={styles.iconContainer}>
-            <Ionicons name="star" size={40} color="#000" />
+            <Ionicons name="star" size={40} color="#FFD66B" />
           </View>
 
           <Text style={styles.title}>Premium Feature</Text>
@@ -37,15 +37,15 @@ const PremiumModal = ({visible, onClose, onUpgrade, featureName}) => {
 
           <View style={styles.featuresContainer}>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#000" />
+              <Ionicons name="checkmark-circle" size={20} color="#FFD66B" />
               <Text style={styles.featureText}>Unlimited Items</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#000" />
+              <Ionicons name="checkmark-circle" size={20} color="#FFD66B" />
               <Text style={styles.featureText}>Smart Outfit Suggestions</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#000" />
+              <Ionicons name="checkmark-circle" size={20} color="#FFD66B" />
               <Text style={styles.featureText}>Ad-Free Experience</Text>
             </View>
           </View>
@@ -54,6 +54,7 @@ const PremiumModal = ({visible, onClose, onUpgrade, featureName}) => {
             title="Upgrade to Premium"
             onPress={onUpgrade}
             buttonStyle={styles.upgradeButton}
+            textStyle={styles.upgradeButtonText}
           />
 
           <TouchableOpacity onPress={onClose}>
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: '#2D333B',
     borderRadius: 20,
     padding: 20,
     width: width * 0.9,
@@ -94,12 +95,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
+    color: '#FFD66B',
   },
   description: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#666',
+    color: '#eee',
     marginBottom: 20,
+    lineHeight: 22,
   },
   featuresContainer: {
     marginBottom: 20,
@@ -112,15 +115,19 @@ const styles = StyleSheet.create({
   featureText: {
     marginLeft: 10,
     fontSize: 16,
+    color: '#eee',
   },
   upgradeButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     marginBottom: 30,
     width: '70%',
   },
+  upgradeButtonText: {
+    color: '#222831',
+  },
   cancelText: {
     textAlign: 'center',
-    color: '#666',
+    color: '#eee',
     padding: 10,
   },
 });
