@@ -61,7 +61,7 @@ const Suggested = () => {
     return (
       <View style={styles.premiumContainer}>
         <View style={styles.premiumContent}>
-          <Ionicons name="star" size={60} color="#000" />
+          <Ionicons name="star" size={60} color="#FFD66B" />
           <Text style={styles.premiumTitle}>Premium Feature</Text>
           <Text style={styles.premiumDescription}>
             Get personalized outfit suggestions based on your style, weather,
@@ -95,19 +95,19 @@ const Suggested = () => {
           <Ionicons
             name="filter"
             size={18}
-            color="#000"
+            color="#222831"
             style={{marginRight: 6}}
           />
-          <Text style={{fontWeight: 'bold'}}>Filter</Text>
+          <Text style={styles.topBtnText}>Filter</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.topBtn}>
           <Ionicons
             name="swap-vertical"
             size={18}
-            color="#000"
+            color="#222831"
             style={{marginRight: 6}}
           />
-          <Text style={{fontWeight: 'bold'}}>Sort</Text>
+          <Text style={styles.topBtnText}>Sort</Text>
         </TouchableOpacity>
       </View>
 
@@ -128,14 +128,14 @@ const Suggested = () => {
               <Ionicons
                 name={FILTER_ICONS[filter]}
                 size={16}
-                color={selectedFilter === filter ? '#fff' : '#000'}
+                color={selectedFilter === filter ? '#222831' : '#eee'}
                 style={{marginRight: 6}}
               />
               <Text
-                style={{
-                  color: selectedFilter === filter ? '#fff' : '#000',
-                  fontWeight: 'bold',
-                }}>
+                style={[
+                  styles.filterText,
+                  selectedFilter === filter && styles.activeFilterText,
+                ]}>
                 {filter}
               </Text>
             </View>
@@ -145,7 +145,9 @@ const Suggested = () => {
 
       {/* Content Placeholder */}
       <View style={styles.body}>
-        <Text>Your Suggested Items for: {selectedFilter}</Text>
+        <Text style={styles.bodyText}>
+          Your Suggested Items for: {selectedFilter}
+        </Text>
       </View>
     </View>
   );
@@ -156,6 +158,7 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
     paddingTop: 20,
+    backgroundColor: '#222831',
   },
 
   topButtons: {
@@ -167,11 +170,16 @@ const styles = StyleSheet.create({
   topBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#eee',
+    backgroundColor: '#FFD66B',
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 12,
-    marginRight: 10,
+    marginRight: 8,
+  },
+
+  topBtnText: {
+    fontWeight: 'bold',
+    color: '#222831',
   },
 
   filterBar: {
@@ -180,17 +188,26 @@ const styles = StyleSheet.create({
   },
 
   filterBtn: {
-    marginRight: 10,
+    marginRight: 8,
     paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: '#eee',
+    paddingHorizontal: 12,
+    backgroundColor: '#2D333B',
     borderRadius: 12,
     height: 35,
     justifyContent: 'center',
   },
 
   activeFilter: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
+  },
+
+  filterText: {
+    color: '#eee',
+    fontWeight: 'bold',
+  },
+
+  activeFilterText: {
+    color: '#222831',
   },
 
   body: {
@@ -199,18 +216,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  bodyText: {
+    color: '#eee',
+    fontSize: 16,
+  },
+
   floatingBtn: {
     position: 'absolute',
     bottom: 40,
     right: 25,
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     borderRadius: 16,
     paddingVertical: 10,
     paddingHorizontal: 16,
   },
 
   floatingText: {
-    color: '#fff',
+    color: '#222831',
     fontWeight: 'bold',
   },
 
@@ -218,7 +240,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#222831',
     padding: 20,
   },
   premiumContent: {
@@ -231,23 +253,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
+    color: '#FFD66B',
   },
   premiumDescription: {
     fontSize: 16,
-    color: '#666',
+    color: '#eee',
     textAlign: 'center',
     marginBottom: 30,
     lineHeight: 24,
   },
   upgradeButton: {
-    backgroundColor: '#000',
+    backgroundColor: '#FFD66B',
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,
     width: '100%',
   },
   upgradeButtonText: {
-    color: '#fff',
+    color: '#222831',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',

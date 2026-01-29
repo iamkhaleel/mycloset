@@ -13,7 +13,8 @@ import {
   Pressable,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useCallback} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
@@ -104,6 +105,13 @@ const MyCloset = () => {
   useEffect(() => {
     fetchClosetItems();
   }, []);
+
+  // Auto-refresh when screen comes into focus (e.g., after adding an item)
+  useFocusEffect(
+    useCallback(() => {
+      fetchClosetItems();
+    }, []),
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
