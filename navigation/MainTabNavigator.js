@@ -14,6 +14,7 @@ const MainTabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        sceneStyle: {backgroundColor: '#222831'},
         tabBarStyle: {
           backgroundColor: '#222831',
           borderTopColor: '#3B4048',
@@ -41,6 +42,7 @@ const MainTabNavigator = () => {
         name="Outfits"
         component={Outfits}
         options={{
+          lazy: false,
           tabBarIcon: ({color, size}) => (
             <Ionicons name="pricetags-outline" size={size} color={color} />
           ),
@@ -50,6 +52,7 @@ const MainTabNavigator = () => {
         name="Lookbooks"
         component={Lookbooks}
         options={{
+          lazy: false,
           tabBarIcon: ({color, size}) => (
             <Ionicons name="book-outline" size={size} color={color} />
           ),

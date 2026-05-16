@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -35,39 +35,54 @@ const Outfits = () => {
   const [isPremium, setIsPremium] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
-  const fetchOutfits = async () => {
-    try {
-      const {docs} = await getUserDocs('outfits');
-      setOutfits(docs);
-    } catch (error) {
-      console.error('Error fetching outfits:', error);
-      Alert.alert('Error', 'Failed to load outfits');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  useEffect(() => {
-    checkUserPremiumStatus();
-    fetchOutfits();
-  }, []);
-
-  // Auto-refresh when screen comes into focus (e.g., after adding an outfit)
+  // Single load path on focus (avoids duplicate Firestore reads from useEffect + useFocusEffect).
   useFocusEffect(
     useCallback(() => {
-      fetchOutfits();
+      let cancelled = false;
+
+      const load = async () => {
+        try {
+          const [{docs}, premium] = await Promise.all([
+            getUserDocs('outfits'),
+            checkPremiumStatus(),
+          ]);
+          if (!cancelled) {
+            setOutfits(docs);
+            setIsPremium(premium);
+          }
+        } catch (error) {
+          if (!cancelled) {
+            console.error('Error fetching outfits:', error);
+            Alert.alert('Error', 'Failed to load outfits');
+          }
+        } finally {
+          if (!cancelled) {
+            setLoading(false);
+            setRefreshing(false);
+          }
+        }
+      };
+
+      load();
+      return () => {
+        cancelled = true;
+      };
     }, []),
   );
 
-  const checkUserPremiumStatus = async () => {
-    const premium = await checkPremiumStatus();
-    setIsPremium(premium);
-  };
-
   const onRefresh = () => {
     setRefreshing(true);
-    fetchOutfits();
+    (async () => {
+      try {
+        const {docs} = await getUserDocs('outfits');
+        setOutfits(docs);
+      } catch (error) {
+        console.error('Error fetching outfits:', error);
+        Alert.alert('Error', 'Failed to load outfits');
+      } finally {
+        setRefreshing(false);
+      }
+    })();
   };
 
   const handleAddOutfit = () => {
@@ -126,7 +141,8 @@ const Outfits = () => {
       }
 
       // Refresh the outfits list
-      await fetchOutfits();
+      const {docs} = await getUserDocs('outfits');
+      setOutfits(docs);
 
       // Show appropriate message
       if (failedDeletions.length > 0) {
@@ -150,7 +166,7 @@ const Outfits = () => {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color="#FFD66B" />
       </SafeAreaView>
     );
   }
@@ -470,6 +486,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#222831',
   },
 });
 

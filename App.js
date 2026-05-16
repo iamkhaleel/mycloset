@@ -1,8 +1,16 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import AppNavigator from './navigation/AppNaviagtor';
 import RootStackNavigator from './navigation/RootStackNavigator';
 import {AuthProvider, useAuth} from './contexts/AuthContext';
+
+const navigationTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#222831',
+  },
+};
 
 function RootNavigation() {
   const {user, loading} = useAuth();
@@ -12,7 +20,7 @@ function RootNavigation() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navigationTheme}>
       {user ? <RootStackNavigator /> : <AppNavigator />}
     </NavigationContainer>
   );

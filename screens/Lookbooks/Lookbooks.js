@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -35,38 +35,52 @@ const Lookbooks = () => {
   const [isPremium, setIsPremium] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
-  const fetchLookbooks = async () => {
-    try {
-      const {docs} = await getUserDocs('lookbooks');
-      setLookbooks(docs);
-    } catch (error) {
-      console.error('Error fetching lookbooks:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  useEffect(() => {
-    checkUserPremiumStatus();
-    fetchLookbooks();
-  }, []);
-
-  // Auto-refresh when screen comes into focus (e.g., after adding a lookbook)
+  // Single load path on focus (avoids duplicate Firestore reads from useEffect + useFocusEffect).
   useFocusEffect(
     useCallback(() => {
-      fetchLookbooks();
+      let cancelled = false;
+
+      const load = async () => {
+        try {
+          const [{docs}, premium] = await Promise.all([
+            getUserDocs('lookbooks'),
+            checkPremiumStatus(),
+          ]);
+          if (!cancelled) {
+            setLookbooks(docs);
+            setIsPremium(premium);
+          }
+        } catch (error) {
+          if (!cancelled) {
+            console.error('Error fetching lookbooks:', error);
+          }
+        } finally {
+          if (!cancelled) {
+            setLoading(false);
+            setRefreshing(false);
+          }
+        }
+      };
+
+      load();
+      return () => {
+        cancelled = true;
+      };
     }, []),
   );
 
-  const checkUserPremiumStatus = async () => {
-    const premium = await checkPremiumStatus();
-    setIsPremium(premium);
-  };
-
   const onRefresh = () => {
     setRefreshing(true);
-    fetchLookbooks();
+    (async () => {
+      try {
+        const {docs} = await getUserDocs('lookbooks');
+        setLookbooks(docs);
+      } catch (error) {
+        console.error('Error fetching lookbooks:', error);
+      } finally {
+        setRefreshing(false);
+      }
+    })();
   };
 
   const handleAddLookbook = () => {
@@ -127,7 +141,8 @@ const Lookbooks = () => {
       }
 
       // Refresh the lookbooks list
-      await fetchLookbooks();
+      const {docs} = await getUserDocs('lookbooks');
+      setLookbooks(docs);
 
       // Show appropriate message
       if (failedDeletions.length > 0) {
@@ -151,7 +166,7 @@ const Lookbooks = () => {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color="#FFD66B" />
       </SafeAreaView>
     );
   }
@@ -313,6 +328,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#222831',
   },
   header: {
     flexDirection: 'row',

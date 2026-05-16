@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useCallback, useRef} from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
-import {useCallback} from 'react';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
@@ -68,10 +67,14 @@ const MyCloset = () => {
   const [menuVisible, setMenuVisible] = useState(false);
 
   const navigation = useNavigation();
+  const hasCompletedInitialFetchRef = useRef(false);
 
-  const fetchClosetItems = async () => {
+  const fetchClosetItems = useCallback(async (options = {}) => {
+    const {isPullRefresh = false, cancelledRef} = options;
     try {
-      setLoading(true);
+      if (!hasCompletedInitialFetchRef.current && !isPullRefresh) {
+        setLoading(true);
+      }
       const user = auth().currentUser;
       if (!user) throw new Error('No authenticated user');
       const querySnapshot = await firestore()
@@ -85,37 +88,44 @@ const MyCloset = () => {
         ...doc.data(),
       }));
 
-      // Sort by createdAt or timestamp (descending)
       items.sort((a, b) => {
         const aDate = a.createdAt?.toDate?.() || a.timestamp?.toDate?.() || 0;
         const bDate = b.createdAt?.toDate?.() || b.timestamp?.toDate?.() || 0;
         return bDate - aDate;
       });
 
+      if (cancelledRef?.current) {
+        return;
+      }
+
       setClosetItems(items);
     } catch (error) {
-      console.error('Error fetching items:', error);
-      Alert.alert('Error', 'Failed to load closet items');
+      if (!cancelledRef?.current) {
+        console.error('Error fetching items:', error);
+        Alert.alert('Error', 'Failed to load closet items');
+      }
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (!cancelledRef?.current) {
+        setLoading(false);
+        setRefreshing(false);
+        hasCompletedInitialFetchRef.current = true;
+      }
     }
-  };
-
-  useEffect(() => {
-    fetchClosetItems();
   }, []);
 
-  // Auto-refresh when screen comes into focus (e.g., after adding an item)
   useFocusEffect(
     useCallback(() => {
-      fetchClosetItems();
-    }, []),
+      const cancelledRef = {current: false};
+      fetchClosetItems({cancelledRef});
+      return () => {
+        cancelledRef.current = true;
+      };
+    }, [fetchClosetItems]),
   );
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchClosetItems();
+    fetchClosetItems({isPullRefresh: true});
   };
 
   // Filter items based on selected category
@@ -356,7 +366,7 @@ const MyCloset = () => {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{flexGrow: 0}}
+        contentContainerStyle={styles.filterTabsContent}
         style={{flexGrow: 0, marginTop: 10, height: 50}}>
         {FILTERS.map((filter, index) => (
           <TouchableOpacity
@@ -514,6 +524,10 @@ const styles = StyleSheet.create({
   filterBar: {
     paddingVertical: 10,
     paddingHorizontal: 10,
+  },
+  filterTabsContent: {
+    flexGrow: 0,
+    paddingStart: 10,
   },
   filterBtn: {
     marginRight: 8,
