@@ -40,6 +40,8 @@ const Login = () => {
       await GoogleSignin.configure({
         webClientId:
           '738710187136-m02ql9s8s2pb54kd68tc26dqlo2n3493.apps.googleusercontent.com',
+        iosClientId:
+          '738710187136-f6vi2871puki8q6lc50fs3rur95t2fvj.apps.googleusercontent.com',
         offlineAccess: true,
         forceCodeForRefreshToken: true,
       });
@@ -92,8 +94,11 @@ const Login = () => {
     try {
       setLoading(true);
 
-      // Check if your device supports Google Play
-      await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      if (Platform.OS === 'android') {
+        await GoogleSignin.hasPlayServices({
+          showPlayServicesUpdateDialog: true,
+        });
+      }
 
       // Sign in and get tokens
       const userInfo = await GoogleSignin.signIn();
