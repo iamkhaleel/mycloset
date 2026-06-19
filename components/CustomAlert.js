@@ -37,9 +37,7 @@ const CustomAlert = ({visible, title, message, buttons, onDismiss}) => {
   const typeConfig = TYPE_CONFIG[alertType];
 
   const resolvedButtons =
-    buttons && buttons.length > 0
-      ? buttons
-      : [{text: 'OK', style: 'default'}];
+    buttons && buttons.length > 0 ? buttons : [{text: 'OK', style: 'default'}];
 
   const handlePress = button => {
     onDismiss();
@@ -56,18 +54,23 @@ const CustomAlert = ({visible, title, message, buttons, onDismiss}) => {
       onRequestClose={onDismiss}>
       <View style={styles.overlay}>
         <View style={styles.content}>
-          <View style={[styles.iconContainer, {backgroundColor: `${typeConfig.color}22`}]}>
-            <Ionicons name={typeConfig.icon} size={32} color={typeConfig.color} />
+          <View
+            style={[
+              styles.iconContainer,
+              {backgroundColor: `${typeConfig.color}22`},
+            ]}>
+            <Ionicons
+              name={typeConfig.icon}
+              size={32}
+              color={typeConfig.color}
+            />
           </View>
 
           <Text style={styles.title}>{title}</Text>
           {message ? <Text style={styles.message}>{message}</Text> : null}
 
           <View
-            style={[
-              styles.buttonRow,
-              isMultiButton && styles.buttonRowMulti,
-            ]}>
+            style={[styles.buttonRow, isMultiButton && styles.buttonRowMulti]}>
             {resolvedButtons.map((button, index) => {
               const isDestructive = button.style === 'destructive';
               const isCancel = button.style === 'cancel';

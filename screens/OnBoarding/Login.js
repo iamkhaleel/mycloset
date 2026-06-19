@@ -82,10 +82,7 @@ const Login = () => {
       });
     } catch (error) {
       console.error('Google Sign-in error:', error);
-      Alert.alert(
-        'Error',
-        error.message || 'Failed to sign in with Google',
-      );
+      Alert.alert('Error', error.message || 'Failed to sign in with Google');
     } finally {
       setLoading(false);
     }
@@ -241,7 +238,8 @@ const Login = () => {
         style={styles.linkButton}
         onPress={() => navigation.navigate('SignUp')}>
         <Text style={styles.linkText}>
-          Don't have an account? <Text style={styles.linkTextBold}>Sign Up</Text>
+          Don't have an account?{' '}
+          <Text style={styles.linkTextBold}>Sign Up</Text>
         </Text>
       </TouchableOpacity>
     </View>
