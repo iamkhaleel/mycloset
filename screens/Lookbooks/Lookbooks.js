@@ -7,11 +7,11 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
-  Alert,
   Modal,
   Pressable,
   SafeAreaView,
 } from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {getUserDocs, deleteUserDoc} from '../../utils/FirestoreService';
 import LookbookCard from '../../components/LookbookCard';

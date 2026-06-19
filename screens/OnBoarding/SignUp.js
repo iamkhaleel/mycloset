@@ -7,21 +7,17 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   Dimensions,
-  Platform,
 } from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 import {useNavigation} from '@react-navigation/native';
 import ResponsiveButton from '../../components/Button';
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {
-  GoogleSignin,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {saveUser} from '../../utils/AuthStorage';
+import {signInWithGoogle} from '../../utils/googleAuth';
 
 const {width, height} = Dimensions.get('window');
 
@@ -35,25 +31,6 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {width, height} = Dimensions.get('window');
-
-  useEffect(() => {
-    configureGoogleSign();
-  }, []);
-
-  const configureGoogleSign = async () => {
-    try {
-      await GoogleSignin.configure({
-        webClientId:
-          '738710187136-m02ql9s8s2pb54kd68tc26dqlo2n3493.apps.googleusercontent.com',
-        iosClientId:
-          '738710187136-f6vi2871puki8q6lc50fs3rur95t2fvj.apps.googleusercontent.com',
-        offlineAccess: true,
-        forceCodeForRefreshToken: true,
-      });
-    } catch (error) {
-      console.error('Google Sign-in configuration error:', error);
-    }
-  };
 
   const handleGoback = () => {
     navigation.goBack();
@@ -102,47 +79,11 @@ const SignUp = () => {
   const handleGoogleSignUp = async () => {
     try {
       setLoading(true);
+      const result = await signInWithGoogle();
 
-      if (Platform.OS === 'android') {
-        await GoogleSignin.hasPlayServices({
-          showPlayServicesUpdateDialog: true,
-        });
+      if (result.cancelled) {
+        return;
       }
-
-      // Sign in and get tokens
-      const userInfo = await GoogleSignin.signIn();
-      const tokens = await GoogleSignin.getTokens();
-
-      if (!tokens || !tokens.accessToken) {
-        throw new Error('Failed to get access token');
-      }
-
-      // Create a Google credential with the token
-      const googleCredential = auth.GoogleAuthProvider.credential(
-        tokens.idToken,
-        tokens.accessToken,
-      );
-
-      // Sign-in the user with the credential
-      const userCredential = await auth().signInWithCredential(
-        googleCredential,
-      );
-
-      // Create user document if it doesn't exist
-      const userDoc = await firestore()
-        .collection('users')
-        .doc(userCredential.user.uid)
-        .get();
-      if (!userDoc.exists) {
-        await firestore().collection('users').doc(userCredential.user.uid).set({
-          email: userCredential.user.email,
-          createdAt: firestore.FieldValue.serverTimestamp(),
-          isPremium: false,
-          premiumExpiryDate: null,
-        });
-      }
-
-      await saveUser(userCredential.user);
 
       navigation.reset({
         index: 0,
@@ -150,26 +91,10 @@ const SignUp = () => {
       });
     } catch (error) {
       console.error('Google Sign-in error:', error);
-
-      // Handle specific Google Sign-in errors
-      if (error.code) {
-        switch (error.code) {
-          case statusCodes.SIGN_IN_CANCELLED:
-            Alert.alert('Error', 'Sign in was cancelled');
-            break;
-          case statusCodes.IN_PROGRESS:
-            Alert.alert('Error', 'Sign in is already in progress');
-            break;
-          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-            Alert.alert('Error', 'Play services not available or outdated');
-            break;
-          default:
-            Alert.alert('Error', 'Failed to sign in with Google');
-        }
-      } else {
-        // Handle other types of errors
-        Alert.alert('Error', error.message || 'Failed to sign in with Google');
-      }
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to sign in with Google',
+      );
     } finally {
       setLoading(false);
     }

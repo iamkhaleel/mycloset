@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
-  Alert,
   SafeAreaView,
   StatusBar,
   Dimensions,
 } from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import firestore from '@react-native-firebase/firestore';

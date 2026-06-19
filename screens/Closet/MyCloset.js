@@ -17,7 +17,7 @@ import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
-import {Alert} from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 
 // Filter names and their corresponding icons
 const FILTERS = [

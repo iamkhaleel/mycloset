@@ -7,9 +7,9 @@ import {
   ScrollView,
   Image,
   TextInput,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';

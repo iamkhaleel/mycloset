@@ -9,8 +9,8 @@ import {
   FlatList,
   ActivityIndicator,
   TextInput,
-  Alert,
 } from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';

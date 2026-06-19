@@ -7,10 +7,10 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
-  Alert,
   SafeAreaView,
   Image,
 } from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {addUserDoc, getUserDocs} from '../../utils/FirestoreService';

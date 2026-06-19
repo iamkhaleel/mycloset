@@ -3,6 +3,7 @@ import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import AppNavigator from './navigation/AppNaviagtor';
 import RootStackNavigator from './navigation/RootStackNavigator';
 import {AuthProvider, useAuth} from './contexts/AuthContext';
+import {AlertProvider} from './contexts/AlertContext';
 
 const navigationTheme = {
   ...DefaultTheme,
@@ -29,7 +30,9 @@ function RootNavigation() {
 export default function App() {
   return (
     <AuthProvider>
-      <RootNavigation />
+      <AlertProvider>
+        <RootNavigation />
+      </AlertProvider>
     </AuthProvider>
   );
 }

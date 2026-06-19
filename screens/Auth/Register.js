@@ -5,9 +5,9 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 import auth from '@react-native-firebase/auth';
 import {saveUser} from '../../utils/AuthStorage';
 

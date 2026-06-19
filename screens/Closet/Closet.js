@@ -6,12 +6,12 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Alert,
   FlatList,
   Image,
   Dimensions,
   RefreshControl,
 } from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {getUserDocs, getCollectionMetadata} from '../../utils/FirestoreService';

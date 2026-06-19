@@ -5,18 +5,19 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Alert,
   Linking,
   Share,
   Platform,
   RefreshControl,
 } from 'react-native';
+import {Alert} from '../../contexts/AlertContext';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {useNavigation, StackActions} from '@react-navigation/native';
 import {checkPremiumStatus} from '../../utils/PremiumFeatures';
 import {removeUser} from '../../utils/AuthStorage';
+import {openEmail} from '../../utils/openEmail';
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -141,21 +142,21 @@ const Settings = () => {
     }
   };
 
-  const handleSupport = () => {
-    if (isPremium) {
-      // Priority support email for premium users
-      Linking.openURL(
-        'mailto:priority-support@mycloset.app?subject=Premium Support Request',
-      ).catch(err => {
-        console.error('Error opening mail:', err);
-        Alert.alert('Error', 'Could not open email client');
-      });
-    } else {
-      // Regular support for free users
-      Linking.openURL('mailto:support@mycloset.app').catch(err => {
-        console.error('Error opening mail:', err);
-        Alert.alert('Error', 'Could not open email client');
-      });
+  const handleSupport = async () => {
+    const email = isPremium
+      ? 'priority-support@mycloset.app'
+      : 'support@mycloset.app';
+    const subject = isPremium ? 'Premium Support Request' : 'Support Request';
+
+    try {
+      await openEmail({email, subject});
+    } catch (error) {
+      console.error('Error opening mail:', error);
+      Alert.alert(
+        'Email support',
+        `Please email us at ${email}`,
+        [{text: 'OK'}],
+      );
     }
   };
 
