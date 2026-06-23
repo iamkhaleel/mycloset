@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -8,26 +8,162 @@ import {
   ScrollView,
   Dimensions,
   SafeAreaView,
+  Share,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import {Alert} from '../../contexts/AlertContext';
+import {LottieLoader} from '../../components/LottieLoader';
 
 const {width, height} = Dimensions.get('window');
 
 const ItemDetails = ({route}) => {
-  const {item} = route.params; // Extract the item from navigation params
   const navigation = useNavigation();
+  const [item, setItem] = useState(route.params.item);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
-  // Format the timestamp to a readable date
+  useFocusEffect(
+    useCallback(() => {
+      const fetchItem = async () => {
+        try {
+          const user = auth().currentUser;
+          if (!user || !route.params?.item?.id) {
+            return;
+          }
+          const doc = await firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('items')
+            .doc(route.params.item.id)
+            .get();
+          if (doc.exists) {
+            setItem({id: doc.id, ...doc.data()});
+          }
+        } catch (error) {
+          console.error('Error fetching item:', error);
+        }
+      };
+
+      fetchItem();
+    }, [route.params?.item?.id]),
+  );
+
   const formatDate = timestamp => {
-    if (!timestamp) return 'N/A';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date();
+    if (!timestamp) {
+      return 'N/A';
+    }
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
   };
+
+  const getColorName = color => {
+    if (!color) {
+      return '';
+    }
+    return color.name || color;
+  };
+
+  const handleShare = async () => {
+    try {
+      const lines = [
+        item.name || 'Closet Item',
+        item.category ? `Category: ${item.category}` : null,
+        item.brand ? `Brand: ${item.brand}` : null,
+        getColorName(item.color) ? `Color: ${getColorName(item.color)}` : null,
+        item.size ? `Size: ${item.size}` : null,
+        item.material ? `Material: ${item.material}` : null,
+        item.price ? `Price: $${item.price}` : null,
+      ].filter(Boolean);
+
+      const shareContent = {
+        message: lines.join('\n'),
+        title: item.name || 'MyCloset Item',
+      };
+
+      if (item.imageUrl) {
+        shareContent.url = item.imageUrl;
+      }
+
+      await Share.share(shareContent);
+    } catch (error) {
+      console.error('Error sharing item:', error);
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    try {
+      setFavoriteLoading(true);
+      const user = auth().currentUser;
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
+      const newFavoriteValue = !item.isFavorite;
+      await firestore()
+        .collection('users')
+        .doc(user.uid)
+        .collection('items')
+        .doc(item.id)
+        .update({isFavorite: newFavoriteValue});
+
+      setItem(prev => ({...prev, isFavorite: newFavoriteValue}));
+    } catch (error) {
+      console.error('Error updating favorite:', error);
+      Alert.alert('Error', 'Failed to update favorite');
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
+  const handleEdit = () => {
+    navigation.navigate('Add', {item, mode: 'edit'});
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Item',
+      `Are you sure you want to delete "${item.name || 'this item'}"?`,
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setDeleteLoading(true);
+              const user = auth().currentUser;
+              if (!user) {
+                throw new Error('No authenticated user');
+              }
+
+              await firestore()
+                .collection('users')
+                .doc(user.uid)
+                .collection('items')
+                .doc(item.id)
+                .delete();
+
+              navigation.goBack();
+            } catch (error) {
+              console.error('Error deleting item:', error);
+              Alert.alert('Error', 'Failed to delete item');
+            } finally {
+              setDeleteLoading(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const itemNote = item.note || item.notes;
 
   const InfoCard = ({icon, label, value, iconColor = '#FFD66B'}) => (
     <View style={styles.infoCard}>
@@ -57,11 +193,22 @@ const ItemDetails = ({route}) => {
             </View>
           </TouchableOpacity>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity style={styles.iconButton} onPress={handleShare}>
               <Ionicons name="share-outline" size={22} color="#FFD66B" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="heart-outline" size={22} color="#FFD66B" />
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleToggleFavorite}
+              disabled={favoriteLoading}>
+              {favoriteLoading ? (
+                <LottieLoader size={28} />
+              ) : (
+                <Ionicons
+                  name={item.isFavorite ? 'heart' : 'heart-outline'}
+                  size={22}
+                  color={item.isFavorite ? '#FF3B30' : '#FFD66B'}
+                />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -159,7 +306,7 @@ const ItemDetails = ({route}) => {
         </View>
 
         {/* Notes Section */}
-        {item.notes && (
+        {itemNote ? (
           <View style={styles.notesSection}>
             <View style={styles.notesHeader}>
               <Ionicons
@@ -170,20 +317,29 @@ const ItemDetails = ({route}) => {
               <Text style={styles.sectionTitle}>Notes</Text>
             </View>
             <View style={styles.notesCard}>
-              <Text style={styles.notesText}>{item.notes}</Text>
+              <Text style={styles.notesText}>{itemNote}</Text>
             </View>
           </View>
-        )}
+        ) : null}
 
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.primaryButton}>
+          <TouchableOpacity style={styles.primaryButton} onPress={handleEdit}>
             <Ionicons name="create-outline" size={20} color="#222831" />
             <Text style={styles.primaryButtonText}>Edit Item</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryButton}>
-            <Ionicons name="trash-outline" size={20} color="#FF3B30" />
-            <Text style={styles.secondaryButtonText}>Delete</Text>
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={handleDelete}
+            disabled={deleteLoading}>
+            {deleteLoading ? (
+              <LottieLoader size={28} />
+            ) : (
+              <>
+                <Ionicons name="trash-outline" size={20} color="#FF3B30" />
+                <Text style={styles.secondaryButtonText}>Delete</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
 

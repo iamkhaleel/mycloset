@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useRef} from 'react';
+import React, {useState, useCallback, useRef, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   ScrollView,
   FlatList,
   Image,
-  ActivityIndicator,
   RefreshControl,
   Modal,
   Pressable,
+  Platform,
 } from 'react-native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
@@ -18,6 +18,7 @@ import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import {Alert} from '../../contexts/AlertContext';
+import {LottieLoader} from '../../components/LottieLoader';
 
 // Filter names and their corresponding icons
 const FILTERS = [
@@ -68,6 +69,61 @@ const MyCloset = () => {
 
   const navigation = useNavigation();
   const hasCompletedInitialFetchRef = useRef(false);
+  const filterScrollRef = useRef(null);
+  const filterViewportWidth = useRef(0);
+  const filterContentWidth = useRef(0);
+  const filterHintActiveRef = useRef(false);
+  const filterHintTimeoutRef = useRef(null);
+
+  const stopFilterScrollHint = useCallback(() => {
+    filterHintActiveRef.current = false;
+    if (filterHintTimeoutRef.current) {
+      clearTimeout(filterHintTimeoutRef.current);
+      filterHintTimeoutRef.current = null;
+    }
+  }, []);
+
+  const startFilterScrollHint = useCallback(() => {
+    stopFilterScrollHint();
+
+    const isScrollable =
+      filterContentWidth.current > filterViewportWidth.current + 8;
+    if (!isScrollable) {
+      return;
+    }
+
+    filterHintActiveRef.current = true;
+    let direction = 1;
+    let completedCycles = 0;
+    const scrollOffset = 26;
+
+    const pulse = () => {
+      if (!filterHintActiveRef.current || completedCycles >= 3) {
+        stopFilterScrollHint();
+        return;
+      }
+
+      filterScrollRef.current?.scrollTo({
+        x: direction > 0 ? scrollOffset : 0,
+        animated: true,
+      });
+
+      direction *= -1;
+      if (direction === 1) {
+        completedCycles += 1;
+      }
+
+      filterHintTimeoutRef.current = setTimeout(pulse, 850);
+    };
+
+    filterHintTimeoutRef.current = setTimeout(pulse, 700);
+  }, [stopFilterScrollHint]);
+
+  useEffect(() => {
+    return () => {
+      stopFilterScrollHint();
+    };
+  }, [stopFilterScrollHint]);
 
   const fetchClosetItems = useCallback(async (options = {}) => {
     const {isPullRefresh = false, cancelledRef} = options;
@@ -117,10 +173,19 @@ const MyCloset = () => {
     useCallback(() => {
       const cancelledRef = {current: false};
       fetchClosetItems({cancelledRef});
+
+      const hintTimer = setTimeout(() => {
+        if (!cancelledRef.current) {
+          startFilterScrollHint();
+        }
+      }, 600);
+
       return () => {
         cancelledRef.current = true;
+        clearTimeout(hintTimer);
+        stopFilterScrollHint();
       };
-    }, [fetchClosetItems]),
+    }, [fetchClosetItems, startFilterScrollHint, stopFilterScrollHint]),
   );
 
   const onRefresh = () => {
@@ -233,53 +298,107 @@ const MyCloset = () => {
     );
   };
 
-  const renderItem = ({item}) => (
-    <TouchableOpacity
-      style={[
-        styles.itemContainer,
-        selectedItems.some(selected => selected.id === item.id) &&
-          styles.selectedItemContainer,
-      ]}
-      onPress={() => handleItemPress(item)}
-      onLongPress={() => handleLongPress(item)}
-      delayLongPress={500}>
-      {item.imageUrl ? (
-        <Image source={{uri: item.imageUrl}} style={styles.itemImage} />
-      ) : item.imageBase64 ? (
-        <Image
-          source={{uri: `data:image/jpeg;base64,${item.imageBase64}`}}
-          style={styles.itemImage}
-        />
-      ) : item.selectedImage ? (
-        <Image source={{uri: item.selectedImage}} style={styles.itemImage} />
-      ) : (
-        <View style={[styles.itemImage, styles.placeholderImage]}>
-          <Ionicons name="image" size={40} color="#ccc" />
+  const renderItem = ({item}) => {
+    const isSelected = selectedItems.some(selected => selected.id === item.id);
+    const colorName =
+      item.color?.name || (typeof item.color === 'string' ? item.color : null);
+    const colorHex =
+      typeof item.color === 'object' && item.color?.hex ? item.color.hex : null;
+
+    return (
+      <TouchableOpacity
+        style={[
+          styles.itemContainer,
+          isSelected && styles.selectedItemContainer,
+        ]}
+        onPress={() => handleItemPress(item)}
+        onLongPress={() => handleLongPress(item)}
+        delayLongPress={500}
+        activeOpacity={0.88}>
+        <View style={styles.imageWrapper}>
+          {item.imageUrl ? (
+            <Image source={{uri: item.imageUrl}} style={styles.itemImage} />
+          ) : item.imageBase64 ? (
+            <Image
+              source={{uri: `data:image/jpeg;base64,${item.imageBase64}`}}
+              style={styles.itemImage}
+            />
+          ) : item.selectedImage ? (
+            <Image
+              source={{uri: item.selectedImage}}
+              style={styles.itemImage}
+            />
+          ) : (
+            <View style={[styles.itemImage, styles.placeholderImage]}>
+              <Ionicons name="shirt-outline" size={36} color="#5c6370" />
+            </View>
+          )}
+
+          <View style={styles.imageOverlay} />
+
+          {item.category ? (
+            <View style={styles.categoryBadge}>
+              <Ionicons
+                name={FILTER_ICONS[item.category] || 'pricetag'}
+                size={11}
+                color="#222831"
+                style={styles.categoryBadgeIcon}
+              />
+              <Text style={styles.categoryBadgeText} numberOfLines={1}>
+                {item.category}
+              </Text>
+            </View>
+          ) : null}
+
+          {item.isFavorite ? (
+            <View style={styles.favoriteBadge}>
+              <Ionicons name="heart" size={13} color="#FF3B30" />
+            </View>
+          ) : null}
+
+          {isSelected ? (
+            <View style={styles.selectionOverlay}>
+              <View style={styles.checkmarkContainer}>
+                <Ionicons name="checkmark-circle" size={28} color="#FFD66B" />
+              </View>
+            </View>
+          ) : null}
         </View>
-      )}
-      {selectedItems.some(selected => selected.id === item.id) && (
-        <View style={styles.selectionOverlay}>
-          <View style={styles.checkmarkContainer}>
-            <Ionicons name="checkmark-circle" size={24} color="#FFD66B" />
-          </View>
-        </View>
-      )}
-      <View style={styles.itemDetails}>
-        <Text style={styles.itemName} numberOfLines={1}>
-          {item.name || 'Unnamed Item'}
-        </Text>
-        <Text style={styles.itemCategory}>{item.category}</Text>
-        {item.color && (
-          <Text style={styles.itemAttribute}>
-            Color: {item.color.name || item.color}
+
+        <View style={styles.itemDetails}>
+          <Text style={styles.itemName} numberOfLines={1}>
+            {item.name || 'Unnamed Item'}
           </Text>
-        )}
-        {item.brand && (
-          <Text style={styles.itemAttribute}>Brand: {item.brand}</Text>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
+
+          {(colorName || item.brand) && (
+            <View style={styles.metaRow}>
+              {colorName ? (
+                <View style={styles.colorChip}>
+                  {colorHex && colorHex.startsWith('#') ? (
+                    <View
+                      style={[styles.colorDot, {backgroundColor: colorHex}]}
+                    />
+                  ) : null}
+                  <Text style={styles.metaText} numberOfLines={1}>
+                    {colorName}
+                  </Text>
+                </View>
+              ) : null}
+              {item.brand ? (
+                <Text style={styles.brandText} numberOfLines={1}>
+                  {item.brand}
+                </Text>
+              ) : null}
+            </View>
+          )}
+
+          {item.price != null && item.price !== '' ? (
+            <Text style={styles.priceText}>${item.price}</Text>
+          ) : null}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const renderSortOption = ({item}) => (
     <Pressable
@@ -364,10 +483,19 @@ const MyCloset = () => {
 
       {/* Filter Options */}
       <ScrollView
+        ref={filterScrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filterTabsContent}
-        style={{flexGrow: 0, marginTop: 10, height: 50}}>
+        style={styles.filterTabsScroll}
+        onLayout={event => {
+          filterViewportWidth.current = event.nativeEvent.layout.width;
+        }}
+        onContentSizeChange={width => {
+          filterContentWidth.current = width;
+        }}
+        onScrollBeginDrag={stopFilterScrollHint}
+        onTouchStart={stopFilterScrollHint}>
         {FILTERS.map((filter, index) => (
           <TouchableOpacity
             key={index}
@@ -398,7 +526,7 @@ const MyCloset = () => {
       {/* Content */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" />
+          <LottieLoader size={72} />
         </View>
       ) : (
         <FlatList
@@ -525,6 +653,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 10,
   },
+  filterTabsScroll: {
+    flexGrow: 0,
+    marginTop: 10,
+    height: 50,
+  },
   filterTabsContent: {
     flexGrow: 0,
     paddingStart: 10,
@@ -570,43 +703,140 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   itemsGrid: {
-    padding: 5,
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    paddingBottom: 100,
   },
   itemContainer: {
     flex: 1,
-    margin: 4,
+    margin: 6,
     backgroundColor: '#2D333B',
-    borderRadius: 22,
+    borderRadius: 18,
     overflow: 'hidden',
-    elevation: 2,
     maxWidth: '48%',
+    borderWidth: 1,
+    borderColor: '#393E46',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 4},
+        shadowOpacity: 0.18,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  imageWrapper: {
+    position: 'relative',
+    backgroundColor: '#1a1f26',
   },
   itemImage: {
     width: '100%',
-    height: 150,
-    backgroundColor: '#3B4048',
+    height: 168,
+    resizeMode: 'cover',
+    backgroundColor: '#1a1f26',
+  },
+  imageOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 48,
+    backgroundColor: 'rgba(0, 0, 0, 0.18)',
   },
   placeholderImage: {
     justifyContent: 'center',
     alignItems: 'center',
   },
+  categoryBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFD66B',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    maxWidth: '75%',
+  },
+  categoryBadgeIcon: {
+    marginRight: 4,
+  },
+  categoryBadgeText: {
+    color: '#222831',
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+  },
+  favoriteBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(34, 40, 49, 0.92)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
   itemDetails: {
-    padding: 10,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
   },
   itemName: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 4,
-    color: '#eee',
+    fontWeight: '700',
+    fontSize: 15,
+    marginBottom: 6,
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
   },
-  itemCategory: {
-    color: '#eee',
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 4,
+  },
+  colorChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#393E46',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    maxWidth: '55%',
+  },
+  colorDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  metaText: {
+    color: '#B0B8C1',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  brandText: {
+    color: '#8d97a3',
+    fontSize: 11,
+    fontWeight: '500',
+    flexShrink: 1,
+  },
+  priceText: {
+    color: '#FFD66B',
     fontSize: 14,
-    marginBottom: 4,
-  },
-  itemAttribute: {
-    color: '#eee',
-    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 4,
   },
   loadingContainer: {
     flex: 1,
@@ -675,26 +905,22 @@ const styles = StyleSheet.create({
   },
   selectedItemContainer: {
     borderWidth: 2,
-    borderColor: '#3B4048',
+    borderColor: '#FFD66B',
   },
   selectionOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkmarkContainer: {
-    backgroundColor: '#2D333B',
-    borderRadius: 16,
-    padding: 4,
+    backgroundColor: 'rgba(34, 40, 49, 0.95)',
+    borderRadius: 20,
+    padding: 2,
+    borderWidth: 2,
+    borderColor: '#FFD66B',
   },
   header: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#3B4048',
     paddingVertical: 8,
   },
   selectionHeader: {
