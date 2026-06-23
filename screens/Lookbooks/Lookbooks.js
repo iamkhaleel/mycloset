@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
   RefreshControl,
   Modal,
   Pressable,
@@ -21,6 +20,7 @@ import {
   FREE_TIER_LIMITS,
 } from '../../utils/PremiumFeatures';
 import PremiumModal from '../../components/PremiumModal';
+import {LottieLoader} from '../../components/LottieLoader';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
@@ -166,7 +166,7 @@ const Lookbooks = () => {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FFD66B" />
+        <LottieLoader size={72} />
       </SafeAreaView>
     );
   }

@@ -6,12 +6,12 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
   SafeAreaView,
   StatusBar,
   Dimensions,
 } from 'react-native';
 import {Alert} from '../../contexts/AlertContext';
+import {LottieLoader} from '../../components/LottieLoader';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import firestore from '@react-native-firebase/firestore';
@@ -96,7 +96,7 @@ const LookbookDetails = ({route}) => {
 
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#FFD66B" />
+              <LottieLoader size={72} />
               <Text style={styles.loadingText}>Loading outfit...</Text>
             </View>
           ) : (

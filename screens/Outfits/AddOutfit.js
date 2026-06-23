@@ -7,10 +7,10 @@ import {
   ScrollView,
   Image,
   FlatList,
-  ActivityIndicator,
   TextInput,
 } from 'react-native';
 import {Alert} from '../../contexts/AlertContext';
+import {LottieLoader} from '../../components/LottieLoader';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -218,7 +218,7 @@ const AddOutfit = () => {
 
         <Text style={styles.sectionTitle}>Your Closet Items</Text>
         {loading ? (
-          <ActivityIndicator size="large" style={styles.loader} />
+          <LottieLoader size={72} style={styles.loader} />
         ) : (
           <FlatList
             data={closetItems}

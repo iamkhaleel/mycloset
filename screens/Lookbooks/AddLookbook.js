@@ -6,11 +6,11 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
-  ActivityIndicator,
   SafeAreaView,
   Image,
 } from 'react-native';
 import {Alert} from '../../contexts/AlertContext';
+import {LottieLoader} from '../../components/LottieLoader';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {addUserDoc, getUserDocs} from '../../utils/FirestoreService';
@@ -211,7 +211,7 @@ const AddLookbook = () => {
 
         <Text style={styles.sectionTitle}>Your Outfits</Text>
         {loading ? (
-          <ActivityIndicator size="large" style={styles.loader} />
+          <LottieLoader size={72} style={styles.loader} />
         ) : outfits.length > 0 ? (
           outfits.map(outfit => (
             <TouchableOpacity

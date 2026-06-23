@@ -7,9 +7,9 @@ import {
   ScrollView,
   Image,
   TextInput,
-  ActivityIndicator,
 } from 'react-native';
 import {Alert} from '../../contexts/AlertContext';
+import {LottieLoader} from '../../components/LottieLoader';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from '@react-native-vector-icons/ionicons';
@@ -127,7 +127,7 @@ const AddItem = () => {
           onPress={handleCreateItem}
           disabled={loading}>
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <LottieLoader size={28} />
           ) : (
             <Text style={styles.saveButtonText}>Add Item</Text>
           )}

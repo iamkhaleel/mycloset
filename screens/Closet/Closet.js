@@ -5,13 +5,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
   FlatList,
   Image,
   Dimensions,
   RefreshControl,
 } from 'react-native';
 import {Alert} from '../../contexts/AlertContext';
+import {LottieLoader} from '../../components/LottieLoader';
 import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {getUserDocs, getCollectionMetadata} from '../../utils/FirestoreService';
@@ -122,7 +122,7 @@ const Closet = () => {
     if (!loadingMore) return null;
     return (
       <View style={styles.loadingMore}>
-        <ActivityIndicator size="small" color="#000" />
+        <LottieLoader size={32} />
       </View>
     );
   };
@@ -137,7 +137,7 @@ const Closet = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
+        <LottieLoader size={72} />
       </View>
     );
   }
