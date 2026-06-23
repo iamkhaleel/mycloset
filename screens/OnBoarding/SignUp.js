@@ -6,10 +6,10 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  ActivityIndicator,
   Dimensions,
 } from 'react-native';
 import {Alert} from '../../contexts/AlertContext';
+import {LottieLoader} from '../../components/LottieLoader';
 import {useNavigation} from '@react-navigation/native';
 import ResponsiveButton from '../../components/Button';
 import {useState} from 'react';
@@ -238,11 +238,7 @@ const SignUp = () => {
 
       {/* Sign Up Button */}
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#FFD66B"
-          style={{marginTop: 6}}
-        />
+        <LottieLoader size={64} style={{marginTop: 6}} />
       ) : (
         <ResponsiveButton
           title="Sign Up"

@@ -9,7 +9,7 @@ import QuestionThree from '../screens/OnBoarding/Questionthree';
 import SignUp from '../screens/OnBoarding/SignUp';
 import {getUser} from '../utils/AuthStorage';
 import {useNavigation} from '@react-navigation/native';
-import {View, ActivityIndicator} from 'react-native';
+import {View} from 'react-native';
 
 const Stack = createStackNavigator();
 

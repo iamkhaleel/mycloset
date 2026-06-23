@@ -5,9 +5,9 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
 } from 'react-native';
 import {Alert} from '../../contexts/AlertContext';
+import {LottieLoader} from '../../components/LottieLoader';
 import auth from '@react-native-firebase/auth';
 import {saveUser} from '../../utils/AuthStorage';
 
@@ -72,7 +72,7 @@ const Login = ({navigation}) => {
         onPress={handleLogin}
         disabled={loading}>
         {loading ? (
-          <ActivityIndicator color="#fff" />
+          <LottieLoader size={28} />
         ) : (
           <Text style={styles.buttonText}>Login</Text>
         )}

@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
   Image,
   SafeAreaView,
   Dimensions,
@@ -15,6 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import {LottieLoader} from '../../components/LottieLoader';
 
 const {width} = Dimensions.get('window');
 
@@ -107,7 +107,7 @@ const OutfitDetails = ({route}) => {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#FFD66B" />
+            <LottieLoader size={72} />
             <Text style={styles.loadingText}>Loading items...</Text>
           </View>
         ) : (
