@@ -50,6 +50,12 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSCameraUsageDescription</key>
+	<string>MyCloset needs camera access so you can take photos of your clothing items.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>MyCloset needs photo library access so you can choose images of your clothing items.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>MyCloset needs permission to save photos you take for your closet items.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
