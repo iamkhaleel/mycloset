@@ -15,6 +15,7 @@ import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {Alert} from '../../contexts/AlertContext';
+import {formatPriceDisplay, parsePrice} from '../../utils/price';
 import {LottieLoader} from '../../components/LottieLoader';
 
 const {width, height} = Dimensions.get('window');
@@ -67,7 +68,20 @@ const ItemDetails = ({route}) => {
     if (!color) {
       return '';
     }
-    return color.name || color;
+    if (typeof color === 'object') {
+      return color.name || '';
+    }
+    return String(color);
+  };
+
+  const formatInfoValue = value => {
+    if (value == null || value === '') {
+      return '';
+    }
+    if (typeof value === 'object') {
+      return getColorName(value);
+    }
+    return String(value);
   };
 
   const handleShare = async () => {
@@ -79,7 +93,7 @@ const ItemDetails = ({route}) => {
         getColorName(item.color) ? `Color: ${getColorName(item.color)}` : null,
         item.size ? `Size: ${item.size}` : null,
         item.material ? `Material: ${item.material}` : null,
-        item.price ? `Price: $${item.price}` : null,
+        item.price ? `Price: ${formatPriceDisplay(item.price)}` : null,
       ].filter(Boolean);
 
       const shareContent = {
@@ -164,6 +178,7 @@ const ItemDetails = ({route}) => {
   };
 
   const itemNote = item.note || item.notes;
+  const priceDisplay = formatPriceDisplay(item.price);
 
   const InfoCard = ({icon, label, value, iconColor = '#FFD66B'}) => (
     <View style={styles.infoCard}>
@@ -172,7 +187,7 @@ const ItemDetails = ({route}) => {
       </View>
       <View style={styles.infoContent}>
         <Text style={styles.infoLabel}>{label}</Text>
-        <Text style={styles.infoValue}>{value}</Text>
+        <Text style={styles.infoValue}>{formatInfoValue(value)}</Text>
       </View>
     </View>
   );
@@ -243,21 +258,21 @@ const ItemDetails = ({route}) => {
 
         {/* Quick Info Grid */}
         <View style={styles.quickInfoGrid}>
-          {item.price && (
+          {priceDisplay ? (
             <View style={styles.quickInfoCard}>
               <Ionicons name="cash-outline" size={20} color="#FFD66B" />
-              <Text style={styles.quickInfoValue}>${item.price}</Text>
+              <Text style={styles.quickInfoValue}>{priceDisplay}</Text>
               <Text style={styles.quickInfoLabel}>Price</Text>
             </View>
-          )}
-          {item.size && (
+          ) : null}
+          {item.size ? (
             <View style={styles.quickInfoCard}>
               <Ionicons name="resize-outline" size={20} color="#FFD66B" />
-              <Text style={styles.quickInfoValue}>{item.size}</Text>
+              <Text style={styles.quickInfoValue}>{String(item.size)}</Text>
               <Text style={styles.quickInfoLabel}>Size</Text>
             </View>
-          )}
-          {item.timestamp && (
+          ) : null}
+          {item.timestamp ? (
             <View style={styles.quickInfoCard}>
               <Ionicons name="calendar-outline" size={20} color="#FFD66B" />
               <Text style={styles.quickInfoValue} numberOfLines={1}>
@@ -265,44 +280,44 @@ const ItemDetails = ({route}) => {
               </Text>
               <Text style={styles.quickInfoLabel}>Added</Text>
             </View>
-          )}
+          ) : null}
         </View>
 
         {/* Detailed Information Cards */}
         <View style={styles.detailsSection}>
           <Text style={styles.sectionTitle}>Details</Text>
 
-          {item.brand && (
+          {item.brand ? (
             <InfoCard
               icon="storefront-outline"
               label="Brand"
               value={item.brand}
             />
-          )}
+          ) : null}
 
-          {item.color && (
+          {item.color ? (
             <InfoCard
               icon="color-palette-outline"
               label="Color"
-              value={item.color.name || item.color}
+              value={getColorName(item.color)}
             />
-          )}
+          ) : null}
 
-          {item.material && (
+          {item.material ? (
             <InfoCard
               icon="cube-outline"
               label="Material"
               value={item.material}
             />
-          )}
+          ) : null}
 
-          {item.timestamp && (
+          {item.timestamp ? (
             <InfoCard
               icon="time-outline"
               label="Date Added"
               value={formatDate(item.timestamp)}
             />
-          )}
+          ) : null}
         </View>
 
         {/* Notes Section */}
