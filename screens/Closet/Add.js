@@ -25,6 +25,11 @@ import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 import {removeBackground} from '../../utils/ImageProcessing';
 import PhotoGuide from '../../components/PhotoGuide';
+import {
+  formatPrice,
+  parsePrice,
+  sanitizePriceInput,
+} from '../../utils/price';
 
 const CATEGORIES = [
   'Tops',
@@ -215,7 +220,7 @@ const AddItem = () => {
     setSize(editItem.size || '');
     setMaterial(editItem.material || '');
     setColor(editItem.color || null);
-    setPrice(editItem.price != null ? String(editItem.price) : '');
+    setPrice(formatPrice(editItem.price) ?? '');
     setNote(editItem.note || editItem.notes || '');
 
     if (editItem.imageUrl) {
@@ -340,6 +345,12 @@ const AddItem = () => {
       return;
     }
 
+    const parsedPrice = parsePrice(price);
+    if (price.trim() && parsedPrice === null) {
+      Alert.alert('Error', 'Please enter a valid price');
+      return;
+    }
+
     setLoading(true);
     try {
       const currentUser = auth().currentUser;
@@ -355,7 +366,7 @@ const AddItem = () => {
         size: size || '',
         material: material || '',
         color: color || '',
-        price: price ? parseFloat(price) : null,
+        price: parsedPrice,
         note: note || '',
         userId: currentUser.uid,
       };
@@ -646,8 +657,8 @@ const AddItem = () => {
               <TextInput
                 placeholder="Price"
                 value={price}
-                onChangeText={setPrice}
-                keyboardType="numeric"
+                onChangeText={text => setPrice(sanitizePriceInput(text))}
+                keyboardType="decimal-pad"
                 style={styles.input}
                 placeholderTextColor={'#eee'}
               />

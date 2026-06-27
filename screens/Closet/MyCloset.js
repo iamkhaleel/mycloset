@@ -19,6 +19,7 @@ import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import {Alert} from '../../contexts/AlertContext';
 import {LottieLoader} from '../../components/LottieLoader';
+import {formatPriceDisplay, parsePrice} from '../../utils/price';
 
 // Filter names and their corresponding icons
 const FILTERS = [
@@ -207,9 +208,9 @@ const MyCloset = () => {
       case 'nameDesc':
         return b.name?.localeCompare(a.name) || 0;
       case 'priceAsc':
-        return (a.price || 0) - (b.price || 0);
+        return (parsePrice(a.price) ?? 0) - (parsePrice(b.price) ?? 0);
       case 'priceDesc':
-        return (b.price || 0) - (a.price || 0);
+        return (parsePrice(b.price) ?? 0) - (parsePrice(a.price) ?? 0);
       case 'dateAsc':
         return (
           (a.timestamp?.toDate() || new Date()) -
@@ -304,6 +305,7 @@ const MyCloset = () => {
       item.color?.name || (typeof item.color === 'string' ? item.color : null);
     const colorHex =
       typeof item.color === 'object' && item.color?.hex ? item.color.hex : null;
+    const priceDisplay = formatPriceDisplay(item.price);
 
     return (
       <TouchableOpacity
@@ -370,7 +372,7 @@ const MyCloset = () => {
             {item.name || 'Unnamed Item'}
           </Text>
 
-          {(colorName || item.brand) && (
+          {colorName || item.brand ? (
             <View style={styles.metaRow}>
               {colorName ? (
                 <View style={styles.colorChip}>
@@ -390,10 +392,10 @@ const MyCloset = () => {
                 </Text>
               ) : null}
             </View>
-          )}
+          ) : null}
 
-          {item.price != null && item.price !== '' ? (
-            <Text style={styles.priceText}>${item.price}</Text>
+          {priceDisplay ? (
+            <Text style={styles.priceText}>{priceDisplay}</Text>
           ) : null}
         </View>
       </TouchableOpacity>
