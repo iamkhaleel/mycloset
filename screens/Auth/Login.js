@@ -10,6 +10,7 @@ import {Alert} from '../../contexts/AlertContext';
 import {LottieLoader} from '../../components/LottieLoader';
 import auth from '@react-native-firebase/auth';
 import {saveUser} from '../../utils/AuthStorage';
+import {getAuthErrorMessage, isExpectedAuthError} from '../../utils/authErrors';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -32,15 +33,13 @@ const Login = ({navigation}) => {
         navigation.replace('MainTabs');
       }
     } catch (error) {
-      let errorMessage = 'An error occurred during login';
-      if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No user found with this email';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Invalid password';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email address';
+      if (!isExpectedAuthError(error)) {
+        console.error('Login error:', error);
       }
-      Alert.alert('Error', errorMessage);
+      Alert.alert(
+        'Error',
+        getAuthErrorMessage(error, 'An error occurred during login'),
+      );
     } finally {
       setLoading(false);
     }

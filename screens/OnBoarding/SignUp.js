@@ -18,6 +18,7 @@ import firestore from '@react-native-firebase/firestore';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import {saveUser} from '../../utils/AuthStorage';
 import {signInWithGoogle} from '../../utils/googleAuth';
+import {getAuthErrorMessage, isExpectedAuthError} from '../../utils/authErrors';
 
 const {width, height} = Dimensions.get('window');
 
@@ -69,8 +70,10 @@ const SignUp = () => {
         routes: [{name: 'Main'}],
       });
     } catch (error) {
-      console.error('Signup error:', error);
-      Alert.alert('Error', error.message);
+      if (!isExpectedAuthError(error)) {
+        console.error('Signup error:', error);
+      }
+      Alert.alert('Error', getAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -90,10 +93,12 @@ const SignUp = () => {
         routes: [{name: 'Main'}],
       });
     } catch (error) {
-      console.error('Google Sign-in error:', error);
+      if (!isExpectedAuthError(error)) {
+        console.error('Google Sign-in error:', error);
+      }
       Alert.alert(
         'Error',
-        error.message || 'Failed to sign in with Google',
+        getAuthErrorMessage(error, 'Failed to sign in with Google'),
       );
     } finally {
       setLoading(false);
