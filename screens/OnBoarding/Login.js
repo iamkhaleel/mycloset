@@ -17,6 +17,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {saveUser} from '../../utils/AuthStorage';
 import {signInWithGoogle} from '../../utils/googleAuth';
+import {getAuthErrorMessage, isExpectedAuthError} from '../../utils/authErrors';
 
 const {width, height} = Dimensions.get('window');
 
@@ -60,8 +61,10 @@ const Login = () => {
         routes: [{name: 'Main'}],
       });
     } catch (error) {
-      console.error('Login error:', error);
-      Alert.alert('Error', error.message);
+      if (!isExpectedAuthError(error)) {
+        console.error('Login error:', error);
+      }
+      Alert.alert('Error', getAuthErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -81,8 +84,13 @@ const Login = () => {
         routes: [{name: 'Main'}],
       });
     } catch (error) {
-      console.error('Google Sign-in error:', error);
-      Alert.alert('Error', error.message || 'Failed to sign in with Google');
+      if (!isExpectedAuthError(error)) {
+        console.error('Google Sign-in error:', error);
+      }
+      Alert.alert(
+        'Error',
+        getAuthErrorMessage(error, 'Failed to sign in with Google'),
+      );
     } finally {
       setLoading(false);
     }
@@ -102,8 +110,13 @@ const Login = () => {
         'Password reset email sent. Please check your inbox.',
       );
     } catch (error) {
-      console.error('Password reset error:', error);
-      Alert.alert('Error', error.message || 'Failed to send reset email');
+      if (!isExpectedAuthError(error)) {
+        console.error('Password reset error:', error);
+      }
+      Alert.alert(
+        'Error',
+        getAuthErrorMessage(error, 'Failed to send reset email'),
+      );
     } finally {
       setLoading(false);
     }

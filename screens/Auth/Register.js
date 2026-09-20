@@ -10,6 +10,7 @@ import {Alert} from '../../contexts/AlertContext';
 import {LottieLoader} from '../../components/LottieLoader';
 import auth from '@react-native-firebase/auth';
 import {saveUser} from '../../utils/AuthStorage';
+import {getAuthErrorMessage, isExpectedAuthError} from '../../utils/authErrors';
 
 const Register = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -46,15 +47,13 @@ const Register = ({navigation}) => {
         navigation.replace('MainTabs');
       }
     } catch (error) {
-      let errorMessage = 'An error occurred during registration';
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'This email is already registered';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email address';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'Password is too weak';
+      if (!isExpectedAuthError(error)) {
+        console.error('Registration error:', error);
       }
-      Alert.alert('Error', errorMessage);
+      Alert.alert(
+        'Error',
+        getAuthErrorMessage(error, 'An error occurred during registration'),
+      );
     } finally {
       setLoading(false);
     }
